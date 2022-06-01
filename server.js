@@ -42,7 +42,7 @@ function processRequest(req, res, method) {
 	const methodIsPut = method === 'PUT'
 	const methodIsDelete = method === 'DELETE'
 
-	if (methodIsPost && !elemExists) elementsWithTag[name] = cssProps
+	if (methodIsPost && !elemExists) elementsWithTag[name] = {}
 	if (methodIsPut && elemExists) elementsWithTag[name].cssProps = cssProps
 	if (methodIsDelete && elemExists) delete elementsWithTag[name]
 
