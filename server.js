@@ -2,6 +2,9 @@ const express = require('express')
 const app = express()
 const PORT = 8000
 
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
 const elements = {
 	typography: {
 		h1: {},
@@ -22,11 +25,26 @@ const elements = {
 }
 
 app.get('/', (_, res) => res.sendFile(__dirname + '/index.html'))
+app.get('/js/main.js', (_, res) => res.sendFile(__dirname + '/js/main.js'))
+
+// Create
+app.post('/api/pieces/elements/:type', (req, res) => {
+	const type = req.params.type
+	const { tag, name, cssProps } = req.body
+	const elementsWithCurrentTag = elements[type][tag]
+	const itAlreadyExists = name in elementsWithCurrentTag
+	if (itAlreadyExists) console.log('An element with this name already exists')
+	else {
+		elementsWithCurrentTag[name] = cssProps
+		console.log(`'${name}', a new instance of ${tag} has been created`)
+	}
+	res.json(elements[type][tag])
+})
 
 // Read
 app.get('/api/pieces/elements/:type', (req, res) => {
-	const endpoint = req.params.type
-	res.json(elements[endpoint])
+	const type = req.params.type
+	res.json(elements[type])
 })
 
 app.listen(PORT, () => {
