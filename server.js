@@ -55,9 +55,23 @@ app.put('/api/pieces/elements/:type', (req, res) => {
 	const itAlreadyExists = name in elementsWithCurrentTag
 	if (itAlreadyExists) {
 		elementsWithCurrentTag[name].cssProps = cssProps
-		console.log(`${name}', an instance of ${tag} has been updated`)
+		console.log(`'${name}', an instance of ${tag} has been updated`)
 	} else {
 		console.log(`There isn't any element called '${name}' yet`)
+	}
+	res.json(elements[type][tag])
+})
+
+app.delete('/api/pieces/elements/:type', (req, res) => {
+	const type = req.params.type
+	const { tag, name } = req.body
+	const elementsWithCurrentTag = elements[type][tag]
+	const itAlreadyExists = name in elementsWithCurrentTag
+	if (itAlreadyExists) {
+		delete elementsWithCurrentTag[name]
+		console.log(`'${name}', an instance of ${tag} has been deleted`)
+	} else {
+		console.log(`There isn't any element called '${name}' to be deleted`)
 	}
 	res.json(elements[type][tag])
 })
