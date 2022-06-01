@@ -32,8 +32,9 @@ async function createPiece(elem, elemName) {
 				cssProps: {},
 			}),
 		})
-		const data = res.json()
+		const data = await res.json()
 		// do something with data
+		console.log(data)
 	} catch (err) {
 		console.log(err)
 	}
@@ -50,8 +51,9 @@ async function savePiece(elem, elemName) {
 				cssProps: {},
 			}),
 		})
-		const data = res.json()
+		const data = await res.json()
 		// do something with data
+		console.log(data)
 	} catch (err) {
 		console.log(err)
 	}
@@ -67,8 +69,9 @@ async function deletePiece(elem, elemName) {
 				name: elemName,
 			}),
 		})
-		const data = res.json()
+		const data = await res.json()
 		// do something with data
+		console.log(data)
 	} catch (err) {
 		console.log(err)
 	}

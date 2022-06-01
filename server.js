@@ -5,6 +5,13 @@ const PORT = 8000
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+// Page & auxfiles requests
+app.get('/', (_, res) => res.sendFile(__dirname + '/index.html'))
+app.get('/js/main.js', (_, res) => res.sendFile(__dirname + '/js/main.js'))
+
+// API endpoints
+const ELEMENTS_ENDPOINT = '/api/pieces/elements/:type'
+
 const elements = {
 	typography: {
 		h1: {},
@@ -24,57 +31,28 @@ const elements = {
 	},
 }
 
-app.get('/', (_, res) => res.sendFile(__dirname + '/index.html'))
-app.get('/js/main.js', (_, res) => res.sendFile(__dirname + '/js/main.js'))
-
-// Create
-app.post('/api/pieces/elements/:type', (req, res) => {
+function processRequest(req, res, method) {
 	const type = req.params.type
 	const { tag, name, cssProps } = req.body
-	const elementsWithCurrentTag = elements[type][tag]
-	const itAlreadyExists = name in elementsWithCurrentTag
-	if (itAlreadyExists) console.log('An element with this name already exists')
-	else {
-		elementsWithCurrentTag[name] = cssProps
-		console.log(`'${name}', a new instance of ${tag} has been created`)
-	}
-	res.json(elements[type][tag])
-})
 
-// Read
-app.get('/api/pieces/elements/:type', (req, res) => {
-	const type = req.params.type
-	res.json(elements[type])
-})
+	const elementsWithTag = elements[type][tag]
+	const elemExists = name in elementsWithTag
 
-// Update
-app.put('/api/pieces/elements/:type', (req, res) => {
-	const type = req.params.type
-	const { tag, name, cssProps } = req.body
-	const elementsWithCurrentTag = elements[type][tag]
-	const itAlreadyExists = name in elementsWithCurrentTag
-	if (itAlreadyExists) {
-		elementsWithCurrentTag[name].cssProps = cssProps
-		console.log(`'${name}', an instance of ${tag} has been updated`)
-	} else {
-		console.log(`There isn't any element called '${name}' yet`)
-	}
-	res.json(elements[type][tag])
-})
+	const methodIsPost = method === 'POST'
+	const methodIsPut = method === 'PUT'
+	const methodIsDelete = method === 'DELETE'
 
-app.delete('/api/pieces/elements/:type', (req, res) => {
-	const type = req.params.type
-	const { tag, name } = req.body
-	const elementsWithCurrentTag = elements[type][tag]
-	const itAlreadyExists = name in elementsWithCurrentTag
-	if (itAlreadyExists) {
-		delete elementsWithCurrentTag[name]
-		console.log(`'${name}', an instance of ${tag} has been deleted`)
-	} else {
-		console.log(`There isn't any element called '${name}' to be deleted`)
-	}
+	if (methodIsPost && !elemExists) elementsWithTag[name] = cssProps
+	if (methodIsPut && elemExists) elementsWithTag[name].cssProps = cssProps
+	if (methodIsDelete && elemExists) delete elementsWithTag[name]
+
 	res.json(elements[type][tag])
-})
+}
+
+app.get(ELEMENTS_ENDPOINT, (req, res) => res.json(elements[req.params.type]))
+app.post(ELEMENTS_ENDPOINT, (req, res) => processRequest(req, res, 'POST'))
+app.put(ELEMENTS_ENDPOINT, (req, res) => processRequest(req, res, 'PUT'))
+app.delete(ELEMENTS_ENDPOINT, (req, res) => processRequest(req, res, 'DELETE'))
 
 app.listen(PORT, () => {
 	console.log(`Server running on port ${PORT}`)
