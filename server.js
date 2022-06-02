@@ -35,6 +35,7 @@ clientPic.serveFile()
 // API endpoints
 const ELEMENTS_ENDPOINT = '/api/pieces/elements/:type'
 
+// Database
 const elements = {
 	typography: {
 		h1: {},
@@ -54,6 +55,7 @@ const elements = {
 	},
 }
 
+// Processing http requests for files that are stored in the database
 function processRequest(req, res, method) {
 	const type = req.params.type
 	const { tag, name, cssProps } = req.body
@@ -61,12 +63,16 @@ function processRequest(req, res, method) {
 	const elementsWithTag = elements[type][tag]
 	const elemExists = name in elementsWithTag
 
+	// Creating the element if it doesn't exist yet
 	const methodIsPost = method === 'POST'
-	const methodIsPut = method === 'PUT'
-	const methodIsDelete = method === 'DELETE'
-
 	if (methodIsPost && !elemExists) elementsWithTag[name] = {}
+	
+	// Updating the element's cssProps
+	const methodIsPut = method === 'PUT'
 	if (methodIsPut && elemExists) elementsWithTag[name].cssProps = cssProps
+	
+	// Deleting the element
+	const methodIsDelete = method === 'DELETE'
 	if (methodIsDelete && elemExists) delete elementsWithTag[name]
 
 	res.json(elements[type][tag])
@@ -77,6 +83,7 @@ app.post(ELEMENTS_ENDPOINT, (req, res) => processRequest(req, res, 'POST'))
 app.put(ELEMENTS_ENDPOINT, (req, res) => processRequest(req, res, 'PUT'))
 app.delete(ELEMENTS_ENDPOINT, (req, res) => processRequest(req, res, 'DELETE'))
 
+// Turning on the server
 app.listen(PORT, () => {
 	console.log(`Server running on port ${PORT}`)
 })
