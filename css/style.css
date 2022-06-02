@@ -1,0 +1,23 @@
+* {
+	box-sizing: border-box;
+}
+
+:root {
+	/* Creating css custom properties */
+	/* Base Colors */
+	--primary-color: #3e3e3e;
+	--text-color-on-primary-bg: #fff;
+  --hover-color-on-primary-bg: #676767;
+
+	/* Colors in relation to elements location */
+	--header-bg-color: var(--primary-color);
+	--header-content-color: var(--text-color-on-primary-bg);
+
+	/* Fonts */
+	--primary-font: Inter, sans-serif;
+}
+
+body {
+	font-family: var(--primary-font);
+	font-size: 0.85rem;
+}

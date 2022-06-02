@@ -21,9 +21,11 @@ class File {
 app.get('/', (_, res) => res.sendFile(__dirname + '/index.html'))
 const cssNormalize = new File('/css/normalize.css')
 const cssStyle = new File('/css/style.css')
+const cssAppHeader = new File('/css/app-header.css')
 const jsMain = new File('/js/main.js')
 cssNormalize.serveFile()
 cssStyle.serveFile()
+cssAppHeader.serveFile()
 jsMain.serveFile()
 
 // Creating and serving image files
@@ -68,11 +70,11 @@ function processRequest(req, res, method) {
 	// Creating the element if it doesn't exist yet
 	const methodIsPost = method === 'POST'
 	if (methodIsPost && !elemExists) elementsWithTag[name] = {}
-	
+
 	// Updating the element's cssProps
 	const methodIsPut = method === 'PUT'
 	if (methodIsPut && elemExists) elementsWithTag[name].cssProps = cssProps
-	
+
 	// Deleting the element
 	const methodIsDelete = method === 'DELETE'
 	if (methodIsDelete && elemExists) delete elementsWithTag[name]

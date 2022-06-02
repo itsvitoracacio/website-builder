@@ -5,24 +5,37 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Website Builder</title>
-		<link rel="stylesheet" href="/css/normalize.css">
+
+		<!-- Importing stylesheets -->
+		<link rel="stylesheet" href="/css/normalize.css" />
 		<link rel="stylesheet" href="/css/style.css" />
+		<link rel="stylesheet" href="/css/app-header.css" />
+
+		<!-- Importing fonts -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600&display=swap"
+			rel="stylesheet"
+		/>
 	</head>
 	<body>
 		<header class="app-header">
 			<nav class="app-nav">
-				<div class="home-icon-area">
-					<a href="/index.html"
-						><img src="/assets/home-icon.svg" alt="Home icon"
-					/></a>
+				<div class="app-nav-main">
+					<div class="home-icon-area">
+						<a href="/index.html"
+							><img src="/assets/home-icon.svg" alt="Home icon"
+						/></a>
+					</div>
+					<ul class="project-phases-list">
+						<li><a href="#">Settings</a></li>
+						<li><a href="#">Edit</a></li>
+						<li><a href="#">Build</a></li>
+						<li><a href="#">Optimize</a></li>
+						<li><a href="#">Publish</a></li>
+					</ul>
 				</div>
-				<ul class="project-phases-list">
-					<li><a href="#">Settings</a></li>
-					<li><a href="#">Edit</a></li>
-					<li><a href="#">Build</a></li>
-					<li><a href="#">Optimize</a></li>
-					<li><a href="#">Publish</a></li>
-				</ul>
 				<div class="profile-pic-area">
 					<a href="#"
 						><img src="/assets/profile-picture.svg" alt="Profile picture"
