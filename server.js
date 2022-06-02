@@ -19,10 +19,12 @@ class File {
 
 // Creating and serving page files and auxiliary files
 app.get('/', (_, res) => res.sendFile(__dirname + '/index.html'))
-const jsMain = new File('/js/main.js')
+const cssNormalize = new File('/css/normalize.css')
 const cssStyle = new File('/css/style.css')
-jsMain.serveFile()
+const jsMain = new File('/js/main.js')
+cssNormalize.serveFile()
 cssStyle.serveFile()
+jsMain.serveFile()
 
 // Creating and serving image files
 const homeIcon = new File('/assets/home-icon.svg')
