@@ -1,0 +1,92 @@
+main {
+	display: flex;
+	height: 100%;
+}
+
+.side-menu {
+	display: flex;
+	flex-direction: column;
+	row-gap: var(--double-step);
+	padding: var(--step);
+	border-right: var(--thin-border) solid var(--divider-color-on-bright-bg);
+	overflow-y: scroll;
+}
+
+/* Hide scrollbar for Chrome */
+.side-menu::-webkit-scrollbar {
+	display: none;
+}
+/* Hide scrollbar for IE, Edge and Firefox */
+.side-menu {
+	-ms-overflow-style: none; /* IE and Edge */
+	scrollbar-width: none; /* Firefox */
+}
+
+.proj-context {
+	display: inline-flex;
+	column-gap: var(--step);
+	width: 100%;
+	padding: var(--step);
+	border: var(--thin-border) solid transparent; /* It just looks better with the border */
+	border-radius: 3px;
+}
+
+.proj-context:hover {
+	background-color: var(--hover-color-on-bright-bg);
+	cursor: default;
+}
+
+.proj-details {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.proj-name {
+	font-weight: var(--font-bold);
+	font-size: var(--initial-font-size);
+}
+
+.client-name {
+	font-size: var(--small-font-size);
+	color: #3e3e3e;
+}
+
+.pieces-category {
+	padding-top: var(--step);
+	padding-left: calc(var(--double-step) * 2);
+}
+
+.pieces-category-name {
+	font-weight: var(--font-bold);
+	position: relative;
+}
+
+.pieces-category-name::before {
+	content: url('/assets/right-chevron.svg');
+	position: absolute;
+	top: 1px;
+	left: calc(0rem - var(--double-step));
+}
+
+.pieces-category li {
+	padding: var(--step);
+	padding-right: calc(var(--step) * 2);
+	border: var(--thin-border) solid transparent;
+	border-radius: 2px;
+	position: relative;
+	left: calc(0rem - var(--step) - var(--thin-border));
+}
+
+.pieces-category li:first-of-type {
+	margin-top: var(--step);
+}
+
+.pieces-category li:hover {
+	background-color: var(--hover-color-on-bright-bg);
+}
+
+.pieces-category-name,
+.pieces-category li {
+	cursor: default;
+}

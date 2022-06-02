@@ -22,19 +22,25 @@ app.get('/', (_, res) => res.sendFile(__dirname + '/index.html'))
 const cssNormalize = new File('/css/normalize.css')
 const cssStyle = new File('/css/style.css')
 const cssAppHeader = new File('/css/app-header.css')
+const cssEditSidebar = new File('/css/edit-sidebar.css')
 const jsMain = new File('/js/main.js')
+const jsSidebar = new File('/js/sidebar.js')
 cssNormalize.serveFile()
 cssStyle.serveFile()
 cssAppHeader.serveFile()
+cssEditSidebar.serveFile()
 jsMain.serveFile()
+jsSidebar.serveFile()
 
 // Creating and serving image files
 const homeIcon = new File('/assets/home-icon.svg')
 const profilePic = new File('/assets/profile-picture.svg')
 const clientPic = new File('/assets/client-picture.svg')
+const chevronIcon = new File('/assets/right-chevron.svg')
 homeIcon.serveFile()
 profilePic.serveFile()
 clientPic.serveFile()
+chevronIcon.serveFile()
 
 // API endpoints
 const ELEMENTS_ENDPOINT = '/api/pieces/elements/:type'

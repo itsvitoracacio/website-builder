@@ -7,7 +7,9 @@
 	/* Base Colors */
 	--primary-color: #3e3e3e;
 	--text-color-on-primary-bg: #fff;
-  --hover-color-on-primary-bg: #676767;
+	--hover-color-on-primary-bg: #676767;
+  --hover-color-on-bright-bg: #e0e0e0;
+  --divider-color-on-bright-bg: #e0e0e0;
 
 	/* Colors in relation to elements location */
 	--header-bg-color: var(--primary-color);
@@ -15,9 +17,28 @@
 
 	/* Fonts */
 	--primary-font: Inter, sans-serif;
+	--font-bold: 600;
+	--initial-font-size: 0.85rem;
+	--small-font-size: calc(var(--initial-font-size) * 0.75);
+
+	/* Spacing */
+	--half-step: calc(var(--step) / 2);
+	--step: 0.5rem;
+	--double-step: calc(var(--step) * 2);
+	--triple-step: calc(var(--step) * 3);
+
+	/* Borders */
+	--thin-border: 1px;
 }
 
 body {
 	font-family: var(--primary-font);
-	font-size: 0.85rem;
+	font-size: var(--initial-font-size);
+	height: calc(100vh - 3rem);
+}
+
+ul {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
 }
