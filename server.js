@@ -5,9 +5,32 @@ const PORT = 8000
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-// Page & auxfiles requests
+// Class that all served files belong to
+class File {
+	constructor(fileAddress) {
+		this.fileAddress = fileAddress
+	}
+	serveFile() {
+		app.get(this.fileAddress, (_, res) =>
+			res.sendFile(__dirname + this.fileAddress)
+		)
+	}
+}
+
+// Creating and serving page files and auxiliary files
 app.get('/', (_, res) => res.sendFile(__dirname + '/index.html'))
-app.get('/js/main.js', (_, res) => res.sendFile(__dirname + '/js/main.js'))
+const jsMain = new File('/js/main.js')
+const cssStyle = new File('/css/style.css')
+jsMain.serveFile()
+cssStyle.serveFile()
+
+// Creating and serving image files
+const homeIcon = new File('/assets/home-icon.svg')
+const profilePic = new File('/assets/profile-picture.svg')
+const clientPic = new File('/assets/client-picture.svg')
+homeIcon.serveFile()
+profilePic.serveFile()
+clientPic.serveFile()
 
 // API endpoints
 const ELEMENTS_ENDPOINT = '/api/pieces/elements/:type'
