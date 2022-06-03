@@ -29,9 +29,9 @@ async function sendHttpRequest(httpMethod, elem, elemName, props) {
 	}
 }
 
-createH1Btn.addEventListener('click', createH1)
-updateH1Btn.addEventListener('click', updateH1)
-deleteH1Btn.addEventListener('click', deleteH1)
+// createH1Btn.addEventListener('click', createH1)
+// updateH1Btn.addEventListener('click', updateH1)
+// deleteH1Btn.addEventListener('click', deleteH1)
 
 const receiveHttpPost = data => {}
 const receiveHttpPut = data => {}
