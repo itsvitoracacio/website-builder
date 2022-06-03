@@ -1,0 +1,167 @@
+/* Whole page */
+.working-area {
+	width: calc(100vw - var(--sidebar-width));
+	height: 100%;
+	padding: var(--step);
+	display: flex;
+	flex-direction: column;
+	row-gap: var(--step);
+}
+
+/* Layout */
+.heading-wrapper {
+	padding: var(--step);
+}
+.selectors-area {
+	padding-top: var(--step);
+}
+.selectors-area,
+.editing-area {
+	padding-left: calc(var(--step) + var(--half-step));
+	padding-right: calc(var(--step) + var(--half-step));
+	padding-bottom: var(--step);
+}
+
+/* Heading area */
+.heading-wrapper h1 {
+	font-size: 2.5rem;
+	margin: 0;
+}
+
+/* Selectors area */
+.selectors-area {
+	display: flex;
+	flex-direction: column;
+	row-gap: calc(var(--step) + var(--half-step));
+}
+
+.tags,
+.variations {
+	display: flex;
+	column-gap: var(--step);
+	align-items: center;
+}
+
+.tag-btn,
+.variation-btn,
+.add-variation-btn {
+	font-family: Consolas, monospace;
+	border: var(--regular-border);
+	border-radius: var(--small-thing-radius);
+}
+
+.tag-btn,
+.variation-btn {
+	background-color: var(--edit-main-selector-color);
+	padding: var(--half-step);
+}
+
+.add-variation-btn {
+	background-color: transparent;
+	border-color: var(--edit-main-selector-color);
+	padding: var(--half-step) var(--step);
+}
+
+.tag-btn:hover,
+.variation-btn:hover,
+.add-variation-btn:hover {
+	background-color: var(--edit-main-selector-hover-color);
+	border-color: var(--edit-main-selector-hover-border-color);
+	border-radius: var(--small-thing-radius);
+}
+
+.tag-btn.isStyled {
+	background-color: var(--edit-main-selector-selected-color);
+}
+
+/* Editing area */
+.editing-area {
+	display: flex;
+	column-gap: var(--double-step);
+	flex-grow: 1;
+}
+
+.rules-area,
+.rendering-area {
+	width: 50%;
+}
+
+.rules-area {
+	border: 1px solid var(--edit-main-selector-hover-border-color);
+}
+
+.rendering-area {
+  display: flex;
+  flex-direction: column;
+  row-gap: var(--double-step)
+}
+
+/* Rendering side */
+.variants-shown {
+	display: flex;
+	column-gap: var(--step);
+}
+
+.variation-label {
+	font-family: Consolas, monospace;
+	border: var(--regular-border);
+	border: none;
+	border-radius: var(--small-thing-radius);
+	display: inline-block;
+	background-color: var(--edit-main-selector-label-color);
+	padding: var(--half-step);
+	padding-right: 0;
+	border-right: 0;
+}
+
+.close-variation-label {
+	font-size: var(--small-font-size);
+	background-color: var(--edit-main-selector-label-close-color);
+	position: relative;
+	top: -0.75px;
+	padding: calc(var(--step) - 1.25px) var(--half-step);
+	border-radius: 0 1px 1px 0;
+	margin-left: var(--half-step);
+}
+
+.close-variation-label:hover {
+	background-color: var(--edit-main-selector-label-close-hover-color);
+}
+
+.render {
+	border: var(--regular-border);
+  background-color: var(--edit-main-selector-color);
+}
+
+.inheritance-area span,
+.side-effects-area span {
+  display: block;
+  padding: calc(var(--step) + var(--half-step));
+  padding-left: 0;
+}
+
+.inheritance-area span::before,
+.side-effects-area span::before {
+	content: url('/assets/right-chevron.svg');
+	display: inline-block;
+	position: relative;
+  top: 1px;
+	padding-left: var(--step);
+	padding-right: var(--step);
+	transition: var(--simple-transition);
+}
+
+.inheritance-area span.open::before,
+.side-effects-area span.open::before {
+	transform: rotate(90deg);
+}
+
+.inheritance-area span.closed::before,
+.side-effects-area span.closed::before {
+	transform: rotate(0deg);
+}
+
+.inherited-rules,
+.side-effects-rules {
+  margin-left: var(--triple-step);
+}

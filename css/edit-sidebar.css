@@ -2,7 +2,7 @@
 	display: flex;
 	flex-direction: column;
 	row-gap: var(--half-step);
-	width: 12rem; /* This may cause responsiveness issues */
+	width: var(--sidebar-width); /* This may cause responsiveness issues */
 	padding: var(--step);
 	border-right: var(--thin-border) solid var(--divider-color-on-bright-bg);
 	overflow-y: scroll;

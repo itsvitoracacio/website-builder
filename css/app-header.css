@@ -1,6 +1,6 @@
 .app-header {
 	background-color: var(--header-bg-color);
-	height: 3rem;
+	height: var(--header-height);
 }
 
 .app-header a:hover {

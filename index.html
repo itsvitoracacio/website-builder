@@ -11,6 +11,7 @@
 		<link rel="stylesheet" href="/css/style.css" />
 		<link rel="stylesheet" href="/css/app-header.css" />
 		<link rel="stylesheet" href="/css/edit-sidebar.css" />
+		<link rel="stylesheet" href="/css/working-area.css" />
 
 		<!-- Importing fonts -->
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -54,8 +55,9 @@
 						<span class="client-name">Client name</span>
 					</div>
 				</div>
-				<ul class="pieces-category open">
-					<span class="pieces-category-name editSidebarBrandingListToggle open"
+				<ul class="pieces-category closed">
+					<span
+						class="pieces-category-name editSidebarBrandingListToggle closed"
 						>Branding</span
 					>
 					<li>Color pallete</li>
@@ -74,9 +76,9 @@
 					<li>Form fields</li>
 					<li>Add element type</li>
 				</ul>
-				<ul class="pieces-category open">
+				<ul class="pieces-category closed">
 					<span
-						class="pieces-category-name editSidebarComponentsListToggle open"
+						class="pieces-category-name editSidebarComponentsListToggle closed"
 						>Components</span
 					>
 					<li>Nav</li>
@@ -89,11 +91,55 @@
 				</ul>
 			</header>
 			<!-- Can you have nested sections? -->
-			<section>
-				<h1>Website Builder</h1>
-				<button id="create-h1">Create &lt;h1&gt;</button>
+			<section class="working-area">
+				<div class="heading-wrapper">
+					<h1>Typography</h1>
+				</div>
+				<div class="selectors-area">
+					<div class="tags">
+						<button id="" class="tag-btn">&lt;h1&gt;</button>
+						<button id="" class="tag-btn">&lt;h2&gt;</button>
+						<button id="" class="tag-btn">&lt;h3&gt;</button>
+						<button id="" class="tag-btn">&lt;h4&gt;</button>
+						<button id="" class="tag-btn">&lt;h5&gt;</button>
+						<button id="" class="tag-btn">&lt;h6&gt;</button>
+						<button id="" class="tag-btn">&lt;p&gt;</button>
+						<button id="" class="tag-btn">&lt;a&gt;</button>
+						<button id="" class="tag-btn">&lt;figcaption&gt;</button>
+					</div>
+					<div class="variations">
+						<span>Variations:</span>
+						<button id="" class="variation-btn">&lt;h1&gt;</button>
+						<button id="" class="variation-btn">&lt;h1&gt; .bright-bg</button>
+						<button id="" class="variation-btn">&lt;h1&gt; .dark-bg</button>
+						<button id="" class="add-variation-btn">+</button>
+					</div>
+				</div>
+				<!-- <button id="create-h1">Create &lt;h1&gt;</button>
 				<button id="update-h1">Update &lt;h1&gt;</button>
-				<button id="delete-h1">Delete &lt;h1&gt;</button>
+				<button id="delete-h1">Delete &lt;h1&gt;</button> -->
+				<div class="editing-area">
+					<div class="rules-area"></div>
+					<div class="rendering-area">
+						<div class="variants-shown">
+							<span id="" class="variation-label">&lt;h1&gt; .bright-bg<span class="close-variation-label">x</span></span>
+							<span id="" class="variation-label">&lt;h1&gt; .bright-bg<span class="close-variation-label">x</span></span>
+						</div>
+						<div class="render">
+							<h1>Lorem ipsum dolor sit amet, consectetur adipsing elit</h1>
+						</div>
+						<div class="inheritance-area closed">
+							<span class="renderInhritedRulesToggle closed">Inheritance</span>
+							<div class="inherited-rules">
+							</div>
+						</div>
+						<div class="side-effects-area closed">
+							<span class="renderSideEffectsRulesToggle closed"
+								>Side-effects</span
+							>
+						</div>
+					</div>
+				</div>
 			</section>
 		</main>
 		<script src="/js/main.js"></script>
