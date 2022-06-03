@@ -1,12 +1,8 @@
-main {
-	display: flex;
-	height: 100%;
-}
-
 .side-menu {
 	display: flex;
 	flex-direction: column;
-	row-gap: var(--double-step);
+	row-gap: var(--half-step);
+	width: 12rem; /* This may cause responsiveness issues */
 	padding: var(--step);
 	border-right: var(--thin-border) solid var(--divider-color-on-bright-bg);
 	overflow-y: scroll;
@@ -27,19 +23,16 @@ main {
 	column-gap: var(--step);
 	width: 100%;
 	padding: var(--step);
-	border: var(--thin-border) solid transparent; /* It just looks better with the border */
-	border-radius: 3px;
-}
-
-.proj-context:hover {
-	background-color: var(--hover-color-on-bright-bg);
-	cursor: default;
+	border: var(--regular-border);
+	border-radius: var(--regular-radius);
+	margin-bottom: var(--double-step);
 }
 
 .proj-details {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
+	row-gap: var(--quarter-step);
 }
 
 .proj-name {
@@ -49,44 +42,60 @@ main {
 
 .client-name {
 	font-size: var(--small-font-size);
-	color: #3e3e3e;
-}
-
-.pieces-category {
-	padding-top: var(--step);
-	padding-left: calc(var(--double-step) * 2);
+	color: var(--alt-text-color-on-bright-bg);
 }
 
 .pieces-category-name {
 	font-weight: var(--font-bold);
-	position: relative;
+	display: block;
+	padding: calc(var(--step) + var(--half-step)) 0;
+	border: var(--regular-border);
+	border-radius: var(--regular-radius);
 }
 
 .pieces-category-name::before {
 	content: url('/assets/right-chevron.svg');
-	position: absolute;
+	display: inline-block;
+	position: relative;
+	padding-left: calc(var(--step) + var(--half-step));
+	padding-right: var(--step);
+	transition: var(--simple-transition);
+}
+
+.pieces-category-name.open::before {
+	top: -1px;
+	transform: rotate(90deg);
+}
+
+.pieces-category-name.closed::before {
 	top: 1px;
-	left: calc(0rem - var(--double-step));
+	transform: rotate(0deg);
+}
+
+.pieces-category.open li {
+	display: block;
+}
+
+.pieces-category.closed li {
+	display: none;
 }
 
 .pieces-category li {
 	padding: var(--step);
-	padding-right: calc(var(--step) * 2);
-	border: var(--thin-border) solid transparent;
-	border-radius: 2px;
-	position: relative;
-	left: calc(0rem - var(--step) - var(--thin-border));
+	padding-right: var(--double-step);
+	border: var(--regular-border);
+	border-radius: var(--regular-radius);
+	margin-left: calc(var(--double-step) + var(--half-step));
+	transition: var(--simple-transition);
 }
 
 .pieces-category li:first-of-type {
-	margin-top: var(--step);
+	margin-top: var(--quarter-step);
 }
 
+.proj-context:hover,
+.pieces-category-name:hover,
 .pieces-category li:hover {
 	background-color: var(--hover-color-on-bright-bg);
-}
-
-.pieces-category-name,
-.pieces-category li {
 	cursor: default;
 }
