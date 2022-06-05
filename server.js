@@ -50,11 +50,19 @@ const ELEMENTS_ENDPOINT = '/api/pieces/elements/:type'
 // Database
 const elements = {
 	typography: {
-		h1: {},
+		h1: {
+			h1: {},
+			'bright-bg': {},
+			'dark-bg': {},
+		},
 		h2: {},
 		h3: {},
 		h4: {},
-		h5: {},
+		h5: {
+			el: {},
+			'bright-bg': {},
+			'dark-bg': {},
+		},
 		h6: {},
 		p: {},
 		a: {},

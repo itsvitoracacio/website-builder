@@ -3,10 +3,6 @@
 	height: var(--header-height);
 }
 
-.app-header a:hover {
-	cursor: default;
-}
-
 .app-nav {
 	display: flex;
 	height: 100%;

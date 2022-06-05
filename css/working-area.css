@@ -71,7 +71,7 @@
 }
 
 .tag-btn.isStyled {
-	background-color: var(--edit-main-selector-selected-color);
+	background-color: var(--edit-main-selector-is-styled-color);
 }
 
 /* Editing area */
@@ -164,4 +164,9 @@
 .inherited-rules,
 .side-effects-rules {
   margin-left: var(--triple-step);
+}
+
+.variations.hidden,
+.editing-area.hidden {
+	visibility: hidden;
 }

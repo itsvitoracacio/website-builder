@@ -81,11 +81,16 @@
 }
 
 .pieces-category li {
+	margin-left: calc(var(--double-step) + var(--half-step));
+}
+
+.pieces-category li button {
+	width: 100%;
+	text-align: left;
 	padding: var(--step);
 	padding-right: var(--double-step);
 	border: var(--regular-border);
 	border-radius: var(--regular-radius);
-	margin-left: calc(var(--double-step) + var(--half-step));
 	transition: var(--simple-transition);
 }
 
@@ -97,5 +102,4 @@
 .pieces-category-name:hover,
 .pieces-category li:hover {
 	background-color: var(--hover-color-on-bright-bg);
-	cursor: default;
 }

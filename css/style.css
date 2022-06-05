@@ -20,7 +20,7 @@
 	--edit-main-selector-color: var(--hover-color-on-bright-bg);
 	--edit-main-selector-hover-color: #fff;
 	--edit-main-selector-hover-border-color: #676767;
-	--edit-main-selector-selected-color: #e6e6e6;
+	--edit-main-selector-is-styled-color: #d3d3d3;
 
 	--edit-main-selector-label-color: #e6e6e6;
 	--edit-main-selector-label-close-color: #d3d3d3;
@@ -69,4 +69,10 @@ ul {
 	list-style-type: none;
 	padding: 0;
 	margin: 0;
+}
+
+button {
+	background-color: transparent;
+	border: none;
+	padding: 0;
 }
