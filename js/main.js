@@ -48,6 +48,8 @@ class EditPieceType {
 	}
 
 	showUserWhereTheyAre() {
+		const siblings = Array.from(this.btn.parentElement.children)
+		siblings.forEach(sibling => sibling.classList.remove('current-place'))
 		this.btn.classList.add('current-place')
 	}
 
@@ -60,11 +62,11 @@ class EditPieceType {
 
 	async showContent() {
 		document.querySelector('#editWorkingAreaH1').innerText = this.pieceType
-		const allParentsOfType = await this.sendGetRequest()
-		for (let parent in allParentsOfType) {
+		const allParentSelectors = await this.sendGetRequest()
+		for (let parent in allParentSelectors) {
 			const selector = new EditSelector(this.pieceType, 'variants', parent)
 			selector.setBtn()
-			selector.markSelectorIfCustomized(allParentsOfType[parent])
+			selector.markSelectorIfCustomized(allParentSelectors[parent])
 			selector.addSelectorBtnToDom(this.contentArea)
 			selector.addEventListenerToRenderContent()
 		}
@@ -83,25 +85,25 @@ class EditSelector extends EditPieceType {
 	get selector() {
 		return this._selector
 	}
-	// get endpoint() {
-	// 	return this._endpoint
-	// }
-	// get btn() {
-	// 	return this._btn
-	// }
 	get contentArea() {
 		return this._contentArea
 	}
 
-	// Function from the prototype that will be modified
-	async renderContent() {
+	// Method from the prototype that will be modified
+	async showContent() {
 		this.makeVariantsLineVisible()
-		console.log(this)
-		const allParentsOfType = await this.sendGetRequest()
-		console.log(allParentsOfType)
+		const allVariantSelectors = await this.sendGetRequest()
+		for (let variant in allVariantSelectors) {
+			const variantBtn = document.createElement('button')
+			variantBtn.classList.add('variation-btn')
+			if (variant === this.selector) variantBtn.innerText = `<${variant}>`
+			else variantBtn.innerText = `<${this.selector}> .${variant}`
+			this.contentArea.appendChild(variantBtn)
+		}
 		this.addNewVariantBtn()
 	}
 
+	// Methods called inside a parent class instance
 	setBtn() {
 		this.btn.classList.add('tag-btn')
 		this.btn.innerText = `<${this.selector}>`
@@ -114,15 +116,22 @@ class EditSelector extends EditPieceType {
 		parentContentArea.appendChild(this.btn)
 	}
 
-	// Functions needed for renderVariants()
+	// Methods needed for renderVariants()
 	makeVariantsLineVisible() {
+		const variantsLineName = document.createElement('span')
+		variantsLineName.innerText = 'Variants:'
+		this.contentArea.appendChild(variantsLineName)
 		this.contentArea.classList.remove('hidden')
 	}
+	makeEditingAreaVisible() {
+		const editingArea = document.querySelector('#editingArea')
+		editingArea.classList.remove('hidden')
+	}
 	addNewVariantBtn() {
-		const addVariantBtn = document.createElement('button')
-		addVariantBtn.classList.add('add-variation-btn')
-		addVariantBtn.innerText = '+'
-		this.contentArea.appendChild(addVariantBtn)
+		const newVariantBtn = document.createElement('button')
+		newVariantBtn.classList.add('add-variation-btn')
+		newVariantBtn.innerText = '+'
+		this.contentArea.appendChild(newVariantBtn)
 	}
 }
 

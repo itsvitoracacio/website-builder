@@ -74,6 +74,10 @@
 	background-color: var(--edit-main-selector-is-styled-color);
 }
 
+.tag-btn.current-place {
+	border-color: var(--edit-main-selector-hover-border-color);
+}
+
 /* Editing area */
 .editing-area {
 	display: flex;
@@ -91,9 +95,9 @@
 }
 
 .rendering-area {
-  display: flex;
-  flex-direction: column;
-  row-gap: var(--double-step)
+	display: flex;
+	flex-direction: column;
+	row-gap: var(--double-step);
 }
 
 /* Rendering side */
@@ -130,14 +134,14 @@
 
 .render {
 	border: var(--regular-border);
-  background-color: var(--edit-main-selector-color);
+	background-color: var(--edit-main-selector-color);
 }
 
 .inheritance-area span,
 .side-effects-area span {
-  display: block;
-  padding: calc(var(--step) + var(--half-step));
-  padding-left: 0;
+	display: block;
+	padding: calc(var(--step) + var(--half-step));
+	padding-left: 0;
 }
 
 .inheritance-area span::before,
@@ -145,7 +149,7 @@
 	content: url('/assets/right-chevron.svg');
 	display: inline-block;
 	position: relative;
-  top: 1px;
+	top: 1px;
 	padding-left: var(--step);
 	padding-right: var(--step);
 	transition: var(--simple-transition);
@@ -163,7 +167,7 @@
 
 .inherited-rules,
 .side-effects-rules {
-  margin-left: var(--triple-step);
+	margin-left: var(--triple-step);
 }
 
 .variations.hidden,

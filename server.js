@@ -45,10 +45,12 @@ clientPic.serveFile()
 chevronIcon.serveFile()
 
 // API endpoints
-const ELEMENTS_ENDPOINT = '/api/pieces/elements/:type'
+const EDIT_PIECETYPE_ENDPOINT = '/api/pieces/elements/:type'
+const EDIT_PARENTSELECTOR_ENDPOINT =
+	'/api/pieces/elements/:type/:parentSelector'
 
 // Database
-const elements = {
+const db = {
 	typography: {
 		h1: {
 			h1: {},
@@ -59,7 +61,7 @@ const elements = {
 		h3: {},
 		h4: {},
 		h5: {
-			el: {},
+			h5: {},
 			'bright-bg': {},
 			'dark-bg': {},
 		},
@@ -78,30 +80,35 @@ const elements = {
 // Processing http requests for files that are stored in the database
 function processRequest(req, res, method) {
 	const type = req.params.type
-	const { tag, name, cssProps } = req.body
+	const { selector, name, cssProps } = req.body
 
-	const elementsWithTag = elements[type][tag]
-	const elemExists = name in elementsWithTag
+	// const elementsWithTag = elements[type][selector]
+	// const elemExists = name in elementsWithTag
 
-	// Creating the element if it doesn't exist yet
-	const methodIsPost = method === 'POST'
-	if (methodIsPost && !elemExists) elementsWithTag[name] = {}
+	// // Creating the element if it doesn't exist yet
+	// const methodIsPost = method === 'POST'
+	// if (methodIsPost && !elemExists) elementsWithTag[name] = {}
 
-	// Updating the element's cssProps
-	const methodIsPut = method === 'PUT'
-	if (methodIsPut && elemExists) elementsWithTag[name].cssProps = cssProps
+	// // Updating the element's cssProps
+	// const methodIsPut = method === 'PUT'
+	// if (methodIsPut && elemExists) elementsWithTag[name].cssProps = cssProps
 
-	// Deleting the element
-	const methodIsDelete = method === 'DELETE'
-	if (methodIsDelete && elemExists) delete elementsWithTag[name]
+	// // Deleting the element
+	// const methodIsDelete = method === 'DELETE'
+	// if (methodIsDelete && elemExists) delete elementsWithTag[name]
 
-	res.json(elements[type][tag])
+	res.json(elements[type][selector])
 }
 
-app.get(ELEMENTS_ENDPOINT, (req, res) => res.json(elements[req.params.type]))
-app.post(ELEMENTS_ENDPOINT, (req, res) => processRequest(req, res, 'POST'))
-app.put(ELEMENTS_ENDPOINT, (req, res) => processRequest(req, res, 'PUT'))
-app.delete(ELEMENTS_ENDPOINT, (req, res) => processRequest(req, res, 'DELETE'))
+app.get(EDIT_PIECETYPE_ENDPOINT, (req, res) => res.json(db[req.params.type]))
+app.get(EDIT_PARENTSELECTOR_ENDPOINT, (req, res) => {
+	const param = req.params
+	res.json(db[param.type][param.parentSelector])
+})
+
+// app.post(ELEMENTS_ENDPOINT, (req, res) => processRequest(req, res, 'POST'))
+// app.put(ELEMENTS_ENDPOINT, (req, res) => processRequest(req, res, 'PUT'))
+// app.delete(ELEMENTS_ENDPOINT, (req, res) => processRequest(req, res, 'DELETE'))
 
 // Turning on the server
 app.listen(PORT, () => {
