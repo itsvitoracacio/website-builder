@@ -53,9 +53,8 @@ class EditPieceType {
 
 	cleanContentArea() {
 		const contentArea = document.querySelector(`#${this.contentLevel}Line`)
-		const contentAreaIsFilled = contentArea.children.length
-		while (contentAreaIsFilled) {
-			contentArea.firstChild.remove()
+		while (contentArea.lastChild) {
+			contentArea.removeChild(contentArea.lastChild)
 		}
 	}
 
