@@ -18,6 +18,9 @@ class EditPieceType {
 	get contentLevel() {
 		return this._contentLevel
 	}
+	get contentArea() {
+		return this._contentArea
+	}
 
 	async sendGetRequest() {
 		try {
@@ -60,36 +63,35 @@ class EditPieceType {
 		document.querySelector('#editWorkingAreaH1').innerText = this.pieceType
 		const allParentsOfType = await this.sendGetRequest()
 		for (let parent in allParentsOfType) {
-			const selector = new EditSelector(this.pieceType, parent, 'variants')
+			const selector = new EditSelector(this.pieceType, 'variants', parent)
 			selector.setBtn()
 			selector.markSelectorIfCustomized(allParentsOfType[parent])
-			selector.addSelectorBtnToDom()
+			selector.addSelectorBtnToDom(this.contentArea)
 			selector.addEventListenerToRenderContent()
 		}
 	}
 }
 
 class EditSelector extends EditPieceType {
-	constructor(pieceType, selector, contentLevel) {
-		super(pieceType, contentArea)
-		this._selector = selector
-		this._endpoint = `/api/pieces/elements/${this.pieceType.toLowerCase()}/${
-			this.selector
-		}`
+	constructor(pieceType, contentLevel, selector) {
+		super(pieceType)
+		this._endpoint = `/api/pieces/elements/${this.pieceType.toLowerCase()}/${selector}`
 		this._btn = document.createElement('button')
 		this._contentLevel = contentLevel
+		this._contentArea = document.querySelector(`#${contentLevel}Line`)
+		this._selector = selector
 	}
 	get selector() {
 		return this._selector
 	}
-	get endpoint() {
-		return this._endpoint
-	}
-	get btn() {
-		return this._btn
-	}
-	get contentLevel() {
-		return this._contentLevel
+	// get endpoint() {
+	// 	return this._endpoint
+	// }
+	// get btn() {
+	// 	return this._btn
+	// }
+	get contentArea() {
+		return this._contentArea
 	}
 
 	// Function from the prototype that will be modified
@@ -109,9 +111,8 @@ class EditSelector extends EditPieceType {
 		const selectorIsCustomized = Object.keys(selectorObj).length
 		if (selectorIsCustomized) this.btn.classList.add('isStyled')
 	}
-	addSelectorBtnToDom() {
-		console.log(super.contentArea)
-		super.contentArea.appendChild(this.btn)
+	addSelectorBtnToDom(parentContentArea) {
+		parentContentArea.appendChild(this.btn)
 	}
 
 	// Functions needed for renderVariants()
