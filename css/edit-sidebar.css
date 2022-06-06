@@ -103,3 +103,7 @@
 .pieces-category li:hover {
 	background-color: var(--hover-color-on-bright-bg);
 }
+
+.editType.current-place {
+	background-color: var(--hover-color-on-bright-bg);
+}

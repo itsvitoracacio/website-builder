@@ -1,25 +1,10 @@
 class EditPieceType {
 	constructor(pieceType) {
-		this._pieceType = pieceType
-		this._endpoint = `/api/pieces/elements/${this.pieceType.toLowerCase()}`
-		this._btn = document.querySelector(`#editGet${this.pieceType}Btn`)
-		this._contentLevel = 'parents'
-		this._contentArea = document.querySelector(`#${this.contentLevel}Line`)
-	}
-	get pieceType() {
-		return this._pieceType
-	}
-	get endpoint() {
-		return this._endpoint
-	}
-	get btn() {
-		return this._btn
-	}
-	get contentLevel() {
-		return this._contentLevel
-	}
-	get contentArea() {
-		return this._contentArea
+		this.pieceType = pieceType
+		this.endpoint = `/api/pieces/elements/${this.pieceType.toLowerCase()}`
+		this.btn = document.querySelector(`#editGet${this.pieceType}Btn`)
+		this.childrenLevel = 'parents'
+		this.childrenArea = document.querySelector(`#${this.childrenLevel}Area`)
 	}
 
 	async sendGetRequest() {
@@ -40,10 +25,9 @@ class EditPieceType {
 		this.btn.addEventListener('click', boundRenderContent)
 	}
 
-	// Change name of this method
 	renderContent() {
 		this.showUserWhereTheyAre()
-		this.cleanContentArea()
+		this.cleanChildrenArea()
 		this.showContent()
 	}
 
@@ -53,157 +37,308 @@ class EditPieceType {
 		this.btn.classList.add('current-place')
 	}
 
-	cleanContentArea() {
-		const contentArea = document.querySelector(`#${this.contentLevel}Line`)
-		while (contentArea.lastChild) {
-			contentArea.removeChild(contentArea.lastChild)
+	cleanChildrenArea() {
+		const childrenArea = document.querySelector(`#${this.childrenLevel}Area`)
+		while (childrenArea.lastChild) {
+			childrenArea.removeChild(childrenArea.lastChild)
 		}
 	}
 
 	async showContent() {
 		document.querySelector('#editWorkingAreaH1').innerText = this.pieceType
-		const allParentSelectors = await this.sendGetRequest()
-		for (let parent in allParentSelectors) {
-			const selector = new EditSelector(this.pieceType, 'variants', parent)
-			selector.setBtn()
-			selector.markSelectorIfCustomized(allParentSelectors[parent])
-			selector.addSelectorBtnToDom(this.contentArea)
-			selector.addEventListenerToRenderContent()
+		const allParents = await this.sendGetRequest()
+		for (let parentName in allParents) {
+			const parentSelector = new EditParentSelector(
+				this.pieceType,
+				'variants',
+				parentName
+			)
+			parentSelector.setUpSelectorBtn()
+			parentSelector.markSelectorBtnIfCustomized(allParents[parentName])
+			parentSelector.addSelectorBtnToDom(this.childrenArea)
+			parentSelector.addEventListenerToRenderContent()
 		}
 	}
 }
 
 class EditSelector extends EditPieceType {
-	constructor(pieceType, contentLevel, selector) {
+	constructor(pieceType, childrenLevel, parentName) {
 		super(pieceType)
-		this._endpoint = `/api/pieces/elements/${this.pieceType.toLowerCase()}/${selector}`
-		this._btn = document.createElement('button')
-		this._contentLevel = contentLevel
-		this._contentArea = document.querySelector(`#${contentLevel}Line`)
-		this._selector = selector
+		this.endpoint = `/api/pieces/elements/${this.pieceType.toLowerCase()}/${parentName}`
+		this.btn = document.createElement('button')
+		this.childrenLevel = childrenLevel
+		this.childrenArea = document.querySelector(`#${childrenLevel}Area`)
+		this.parentName = parentName
 	}
-	get selector() {
-		return this._selector
+	setUpSelectorBtn() {
+		console.log('Please set up setUpSelectorBtn() on the child class')
 	}
-	get contentArea() {
-		return this._contentArea
+	addSelectorBtnToDom() {
+		console.log('Please set up addSelectorBtnToDom() on the child class')
+	}
+	showContent() {
+		console.log('Please set up showContent() on the child class')
+	}
+}
+
+class EditParentSelector extends EditSelector {
+	constructor(pieceType, childrenLevel, parentName) {
+		super(pieceType, childrenLevel, parentName)
 	}
 
-	// Method from the prototype that will be modified
-	async showContent() {
-		this.makeVariantsLineVisible()
-		const allVariantSelectors = await this.sendGetRequest()
-		for (let variant in allVariantSelectors) {
-			const variantBtn = document.createElement('button')
-			variantBtn.classList.add('variation-btn')
-			if (variant === this.selector) variantBtn.innerText = `<${variant}>`
-			else variantBtn.innerText = `<${this.selector}> .${variant}`
-			this.contentArea.appendChild(variantBtn)
-		}
-		this.addNewVariantBtn()
-	}
-
-	// Methods called inside a parent class instance
-	setBtn() {
-		this.btn.classList.add('tag-btn')
-		this.btn.innerText = `<${this.selector}>`
-	}
-	markSelectorIfCustomized(selectorObj) {
+	/* Later: try to put this method inside this.setUpSelectorBtn() */
+	markSelectorBtnIfCustomized(selectorObj) {
 		const selectorIsCustomized = Object.keys(selectorObj).length
-		if (selectorIsCustomized) this.btn.classList.add('isStyled')
-	}
-	addSelectorBtnToDom(parentContentArea) {
-		parentContentArea.appendChild(this.btn)
+		if (selectorIsCustomized) this.btn.classList.add('hasSomeVariant')
 	}
 
-	// Methods needed for renderVariants()
-	makeVariantsLineVisible() {
+	// Methods from the prototype that will be modified
+	setUpSelectorBtn() {
+		this.btn.classList.add('tag-btn')
+		this.btn.id = `${this.parentName}ParentSelector`
+		this.btn.innerText = `<${this.parentName}>`
+	}
+	addSelectorBtnToDom(whereOnTheDom) {
+		whereOnTheDom.appendChild(this.btn)
+	}
+	async showContent() {
+		this.createVariantLineSpan()
+		this.createAddNewVariantBtn()
+		const allVariants = await this.sendGetRequest()
+		for (let variantName in allVariants) {
+			const variantSelector = new EditVariantSelector(
+				this.pieceType,
+				'cssRules',
+				this.parentName,
+				variantName
+			)
+			variantSelector.setUpSelectorBtn()
+			variantSelector.addSelectorBtnToDom(this.childrenArea)
+			variantSelector.addEventListenerToRenderContent()
+		}
+		this.makeVariantsLineVisible()
+		this.makeEditingAreaVisible()
+	}
+
+	// Methods needed for this.showContent()
+	createVariantLineSpan() {
 		const variantsLineName = document.createElement('span')
 		variantsLineName.innerText = 'Variants:'
-		this.contentArea.appendChild(variantsLineName)
-		this.contentArea.classList.remove('hidden')
+		this.childrenArea.appendChild(variantsLineName)
+	}
+	createAddNewVariantBtn() {
+		const addNewVariant = new EditAddVariantBtn(
+			this.pieceType,
+			this.endpoint,
+			this.parentName,
+			this.childrenArea
+		)
+		addNewVariant.setUpForm()
+		addNewVariant.setUpBtn()
+		addNewVariant.setUpChangeBtnOnFocus()
+		addNewVariant.appendBtnToForm()
+		this.childrenArea.appendChild(addNewVariant.newVariantForm)
+	}
+	makeVariantsLineVisible() {
+		this.childrenArea.classList.remove('hidden')
 	}
 	makeEditingAreaVisible() {
 		const editingArea = document.querySelector('#editingArea')
 		editingArea.classList.remove('hidden')
 	}
-	addNewVariantBtn() {
-		const newVariantBtn = document.createElement('button')
-		newVariantBtn.classList.add('add-variation-btn')
-		newVariantBtn.innerText = '+'
-		this.contentArea.appendChild(newVariantBtn)
+}
+
+class EditVariantSelector extends EditSelector {
+	constructor(pieceType, childrenLevel, parentName, variantName) {
+		super(pieceType, childrenLevel, parentName)
+		this.variantName = variantName
+	}
+	setUpSelectorBtn() {
+		this.btn.classList.add('variation-btn')
+		this.btn.id = `${this.variantName}VariantSelector`
+		this.btn.classList.add('variantBtn')
+		this.btn.dataset.variantName = this.variantName
+		if (this.variantName === this.parentName)
+			this.btn.innerText = `<${this.parentName}>`
+		else this.btn.innerText = `<${this.parentName}> .${this.variantName}`
+	}
+	addSelectorBtnToDom(whereOnTheDom) {
+		const newVariantForm = document.querySelector('#newVariantForm')
+		whereOnTheDom.insertBefore(this.btn, newVariantForm)
+		// create variantRequests instance of specificHttpReqs
+		// add click event listener to enter this variant (showUserWhereTheyAre, cleanChildrenArea, renderCssRules)
+	}
+	async showContent() {
+		console.log('set up the showContent() method for the variant selectors')
+	}
+}
+
+class EditAddVariantBtn {
+	constructor(pieceType, endpoint, parentName, variantsArea) {
+		this.pieceType = pieceType
+		this.endpoint = endpoint
+		this.parentName = parentName
+		this.newVariantForm = document.createElement('form')
+		this.newVariantBtn = document.createElement('input')
+		this.variantsArea = variantsArea
+	}
+	setUpForm() {
+		this.newVariantForm.autocomplete = 'off'
+		this.newVariantForm.id = 'newVariantForm'
+		this.addSubmitEventListenerToAddNewVariant()
+	}
+	addSubmitEventListenerToAddNewVariant() {
+		this.newVariantForm.addEventListener('submit', e => {
+			e.preventDefault()
+			this.createVariant(this.newVariantBtn.value)
+		})
+	}
+	async createVariant(inputValue = this.parentName) {
+		try {
+			const res = await fetch(this.endpoint, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					pieceType: this.pieceType,
+					parentName: this.parentName,
+					variantName: inputValue,
+				}),
+			})
+			const dbVariants = await res.json()
+			this.receivePostResponse(dbVariants)
+		} catch (err) {
+			console.log(err)
+		}
+	}
+	receivePostResponse(dbVariants) {
+		const dbVariantsNames = Object.keys(dbVariants)
+		const domVariants = Array.from(document.querySelectorAll('.variantBtn'))
+		const domVariantsNames = domVariants.map(v => v.dataset.variantName)
+		const newName = dbVariantsNames.find(v => !domVariantsNames.includes(v))
+		const newVariant = new EditVariantSelector(
+			this.pieceType,
+			'cssRules',
+			this.parentName,
+			newName
+		)
+		newVariant.setUpSelectorBtn()
+		newVariant.addSelectorBtnToDom(this.variantsArea)
+		this.showThatThisParentSelectorNowHasVariants()
+		this.newVariantBtn.blur()
+	}
+	showThatThisParentSelectorNowHasVariants() {
+		const parentSelector = document.querySelector(
+			`#${this.parentName}ParentSelector`
+		)
+		parentSelector.classList.add('hasSomeVariant')
+	}
+	setUpBtn() {
+		this.newVariantBtn.type = 'button'
+		this.newVariantBtn.value = '+'
+		this.newVariantBtn.id = 'newVariantBtn'
+		this.newVariantBtn.classList.add('add-variation-btn')
+		this.newVariantBtn.autocomplete = 'off'
+	}
+	setUpChangeBtnOnFocus() {
+		// Turning btn into input text on click
+		this.newVariantBtn.addEventListener('focusin', () => {
+			// If there isn't any variants on this.parentSelector, create variant with the parentName
+			const thereIsAlreadySomeVariant = document
+				.querySelector(`#${this.parentName}ParentSelector`)
+				.classList.contains('hasSomeVariant')
+			if (thereIsAlreadySomeVariant) this.changeBtnToInput()
+			else this.createVariant()
+		})
+		// Turning input text back into btn on focusout
+		this.newVariantBtn.addEventListener('focusout', () => {
+			this.newVariantBtn.type = 'button'
+			this.newVariantBtn.value = '+'
+		})
+	}
+	changeBtnToInput() {
+		this.newVariantBtn.type = 'text'
+		this.newVariantBtn.value = ''
+		this.newVariantForm.focus()
+		this.newVariantBtn.focus()
+		this.newVariantBtn.select()
+	}
+	appendBtnToForm() {
+		this.newVariantForm.appendChild(this.newVariantBtn)
 	}
 }
 
 const typographyType = new EditPieceType('Typography')
 typographyType.addEventListenerToRenderContent()
 
-// const createH1Btn = document.querySelector('#create-h1')
-// const updateH1Btn = document.querySelector('#update-h1')
-// const deleteH1Btn = document.querySelector('#delete-h1')
+// Not sure if we need these classes below
+class HttpReqs {
+	constructor() {}
+	async sendGetRequest(whereToGetIt) {
+		await this.sendHttpRequest('GET', whereToGetIt)
+	}
 
-// const showTagVariants = event => {
-// 	const el = event.target.dataset.tag
-// 	sendGetRequestVariants(el)
-// }
+	async sendPostRequest(whereToPostIt, whatToPost) {
+		console.log('sending post request')
+		await this.sendHttpRequest('POST', whereToPostIt, whatToPost)
+	}
 
-// const renderVariants = variants => {
+	async sendPutRequest(whereToUpdateIt, whatToUpdate) {
+		await this.sendHttpRequest('PUT', whereToUpdateIt, whatToUpdate)
+	}
 
-// 	for (let variant in variants) {
-// 		const variantBtn = document.createElement('button')
-// 		variantBtn.classList.add('variation-btn')
-// 		// variantBtn.id = ''
-// 		console.log(variant)
-// 		if (variant === 'h1') variantBtn.innerText = `<${variant}>`
-// 		else variantBtn.innerText = `<h1> .${variant}`
-// 		parent.appendChild(variantBtn)
-// 	}
+	async sendDeleteRequest(whereToDeleteItFrom, whatToDelete) {
+		await this.sendHttpRequest('POST', whereToDeleteItFrom, whatToDelete)
+	}
 
-// }
+	async sendHttpRequest(httpMethod, endpoint, reqBody) {
+		try {
+			const res = await fetch(
+				endpoint,
+				httpMethod === 'GET'
+					? {
+							method: 'GET',
+							headers: { 'Content-Type': 'application/json' },
+					  }
+					: {
+							method: httpMethod,
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify(reqBody),
+					  }
+			)
+			const data = await res.json()
+			console.log(data)
+			return data
+			// if (httpMethod === 'POST') receiveHttpPost(data)
+			// if (httpMethod === 'PUT') receiveHttpPut(data)
+			// if (httpMethod === 'DELETE') receiveHttpDelete(data)
+		} catch (err) {
+			console.log(err)
+		}
+	}
+}
 
-// async function sendGetRequestVariants(tag) {
-// 	const endpoint = TYPOGRAPHY_ENDPOINT
-// 	try {
-// 		const res = await fetch(endpoint, {
-// 			method: 'GET',
-// 			headers: { 'Content-Type': 'application/json' },
-// 		})
-// 		const data = await res.json()
-// 		renderVariants(data[tag])
-// 	} catch (err) {
-// 		console.log(err)
-// 	}
-// }
+class EditTypeHttpReqs extends HttpReqs {
+	constructor(pieceType, endpoint) {
+		super()
+		this.pieceType = pieceType
+		this.endpoint = endpoint
+	}
+	getTypeSelectors() {
+		this.sendGetRequest(this.endpoint)
+	}
+}
 
-// const createH1 = () => sendOtherHttpRequest('POST', 'h1', '.alt-h1')
-// const updateH1 = () => sendOtherHttpRequest('PUT', 'h1', '.alt-h1')
-// const deleteH1 = () => sendOtherHttpRequest('DELETE', 'h1', '.alt-h1')
-
-// async function sendOtherHttpRequest(httpMethod, elem, elemName, props) {
-// 	try {
-// 		const res = await fetch(TYPOGRAPHY_ENDPOINT, {
-// 			method: httpMethod,
-// 			headers: { 'Content-Type': 'application/json' },
-// 			body: JSON.stringify({
-// 				tag: elem,
-// 				name: elemName,
-// 				cssProps: props,
-// 			}),
-// 		})
-// 		const data = await res.json()
-// 		if (httpMethod === 'POST') receiveHttpPost(data)
-// 		if (httpMethod === 'PUT') receiveHttpPut(data)
-// 		if (httpMethod === 'DELETE') receiveHttpDelete(data)
-// 		console.log(data)
-// 	} catch (err) {
-// 		console.log(err)
-// 	}
-// }
-
-// // createH1Btn.addEventListener('click', createH1)
-// // updateH1Btn.addEventListener('click', updateH1)
-// // deleteH1Btn.addEventListener('click', deleteH1)
-
-// const receiveHttpPost = data => {}
-// const receiveHttpPut = data => {}
-// const receiveHttpDelete = data => {}
+class EditVariantHttpReqs extends HttpReqs {
+	constructor(pieceType, selector, endpoint) {
+		super()
+		this.pieceType = pieceType
+		this.selector = selector
+		this.endpoint = endpoint
+	}
+	createVariant(variantName) {
+		const pieceType = this.pieceType
+		const selector = this.selector
+		this.sendPutRequest({ pieceType, selector, variantName }, this.endpoint)
+	}
+	readVariantRules(variantName) {}
+}

@@ -70,8 +70,8 @@
 	border-radius: var(--small-thing-radius);
 }
 
-.tag-btn.isStyled {
-	background-color: var(--edit-main-selector-is-styled-color);
+.tag-btn.hasSomeVariant {
+	background-color: var(--edit-main-selector-has-some-variant-color);
 }
 
 .tag-btn.current-place {

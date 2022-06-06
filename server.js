@@ -80,14 +80,15 @@ const db = {
 // Processing http requests for files that are stored in the database
 function processRequest(req, res, method) {
 	const type = req.params.type
-	const { selector, name, cssProps } = req.body
+	const parentSelector = req.params.parentSelector
+	const { variantName, cssProps } = req.body
 
-	// const elementsWithTag = elements[type][selector]
-	// const elemExists = name in elementsWithTag
+	const piecesOfSelectorInDb = db[type][parentSelector]
+	const variantDoesExist = variantName in piecesOfSelectorInDb
 
 	// // Creating the element if it doesn't exist yet
-	// const methodIsPost = method === 'POST'
-	// if (methodIsPost && !elemExists) elementsWithTag[name] = {}
+	const methodIsPost = method === 'POST'
+	if (methodIsPost && !variantDoesExist) piecesOfSelectorInDb[variantName] = {}
 
 	// // Updating the element's cssProps
 	// const methodIsPut = method === 'PUT'
@@ -97,7 +98,7 @@ function processRequest(req, res, method) {
 	// const methodIsDelete = method === 'DELETE'
 	// if (methodIsDelete && elemExists) delete elementsWithTag[name]
 
-	res.json(elements[type][selector])
+	res.json(piecesOfSelectorInDb)
 }
 
 app.get(EDIT_PIECETYPE_ENDPOINT, (req, res) => res.json(db[req.params.type]))
@@ -106,7 +107,9 @@ app.get(EDIT_PARENTSELECTOR_ENDPOINT, (req, res) => {
 	res.json(db[param.type][param.parentSelector])
 })
 
-// app.post(ELEMENTS_ENDPOINT, (req, res) => processRequest(req, res, 'POST'))
+app.post(EDIT_PARENTSELECTOR_ENDPOINT, (req, res) =>
+	processRequest(req, res, 'POST')
+)
 // app.put(ELEMENTS_ENDPOINT, (req, res) => processRequest(req, res, 'PUT'))
 // app.delete(ELEMENTS_ENDPOINT, (req, res) => processRequest(req, res, 'DELETE'))
 
