@@ -34,11 +34,13 @@ class EditPieceType {
 	showUserWhereTheyAre() {
 		const siblings = Array.from(this.btn.parentElement.children)
 		siblings.forEach(sibling => sibling.classList.remove('current-place'))
+
 		this.btn.classList.add('current-place')
 	}
 
 	cleanChildrenArea() {
 		const childrenArea = document.querySelector(`#${this.childrenLevel}Area`)
+
 		while (childrenArea.lastChild) {
 			childrenArea.removeChild(childrenArea.lastChild)
 		}
@@ -46,13 +48,16 @@ class EditPieceType {
 
 	async showContent() {
 		document.querySelector('#editWorkingAreaH1').innerText = this.pieceType
+
 		const allParents = await this.sendGetRequest()
+
 		for (let parentName in allParents) {
 			const parentSelector = new EditParentSelector(
 				this.pieceType,
 				'variants',
 				parentName
 			)
+
 			parentSelector.setUpSelectorBtn()
 			parentSelector.markSelectorBtnIfCustomized(allParents[parentName])
 			parentSelector.addSelectorBtnToDom(this.childrenArea)
@@ -64,18 +69,22 @@ class EditPieceType {
 class EditSelector extends EditPieceType {
 	constructor(pieceType, childrenLevel, parentName) {
 		super(pieceType)
+
 		this.endpoint = `/api/pieces/elements/${this.pieceType.toLowerCase()}/${parentName}`
 		this.btn = document.createElement('button')
 		this.childrenLevel = childrenLevel
 		this.childrenArea = document.querySelector(`#${childrenLevel}Area`)
 		this.parentName = parentName
 	}
+
 	setUpSelectorBtn() {
 		console.log('Please set up setUpSelectorBtn() on the child class')
 	}
+
 	addSelectorBtnToDom() {
 		console.log('Please set up addSelectorBtnToDom() on the child class')
 	}
+
 	showContent() {
 		console.log('Please set up showContent() on the child class')
 	}
@@ -98,13 +107,17 @@ class EditParentSelector extends EditSelector {
 		this.btn.id = `${this.parentName}ParentSelector`
 		this.btn.innerText = `<${this.parentName}>`
 	}
+
 	addSelectorBtnToDom(whereOnTheDom) {
 		whereOnTheDom.appendChild(this.btn)
 	}
+
 	async showContent() {
 		this.createVariantLineSpan()
 		this.createAddNewVariantBtn()
+
 		const allVariants = await this.sendGetRequest()
+
 		for (let variantName in allVariants) {
 			const variantSelector = new EditVariantSelector(
 				this.pieceType,
@@ -112,10 +125,12 @@ class EditParentSelector extends EditSelector {
 				this.parentName,
 				variantName
 			)
+
 			variantSelector.setUpSelectorBtn()
 			variantSelector.addSelectorBtnToDom(this.childrenArea)
 			variantSelector.addEventListenerToRenderContent()
 		}
+
 		this.makeVariantsLineVisible()
 		this.makeEditingAreaVisible()
 	}
@@ -124,8 +139,10 @@ class EditParentSelector extends EditSelector {
 	createVariantLineSpan() {
 		const variantsLineName = document.createElement('span')
 		variantsLineName.innerText = 'Variants:'
+
 		this.childrenArea.appendChild(variantsLineName)
 	}
+
 	createAddNewVariantBtn() {
 		const addNewVariant = new EditAddVariantBtn(
 			this.pieceType,
@@ -133,15 +150,19 @@ class EditParentSelector extends EditSelector {
 			this.parentName,
 			this.childrenArea
 		)
+
 		addNewVariant.setUpForm()
 		addNewVariant.setUpBtn()
 		addNewVariant.setUpChangeBtnOnFocus()
 		addNewVariant.appendBtnToForm()
+
 		this.childrenArea.appendChild(addNewVariant.newVariantForm)
 	}
+
 	makeVariantsLineVisible() {
 		this.childrenArea.classList.remove('hidden')
 	}
+
 	makeEditingAreaVisible() {
 		const editingArea = document.querySelector('#editingArea')
 		editingArea.classList.remove('hidden')
@@ -151,23 +172,29 @@ class EditParentSelector extends EditSelector {
 class EditVariantSelector extends EditSelector {
 	constructor(pieceType, childrenLevel, parentName, variantName) {
 		super(pieceType, childrenLevel, parentName)
+
 		this.variantName = variantName
 	}
+
 	setUpSelectorBtn() {
 		this.btn.classList.add('variation-btn')
 		this.btn.id = `${this.variantName}VariantSelector`
 		this.btn.classList.add('variantBtn')
 		this.btn.dataset.variantName = this.variantName
-		if (this.variantName === this.parentName)
-			this.btn.innerText = `<${this.parentName}>`
-		else this.btn.innerText = `<${this.parentName}> .${this.variantName}`
+
+		this.btn.innerText =
+			this.variantName === this.parentName
+				? (this.btn.innerText = `<${this.parentName}>`)
+				: (this.btn.innerText = `<${this.parentName}> .${this.variantName}`)
 	}
+
 	addSelectorBtnToDom(whereOnTheDom) {
 		const newVariantForm = document.querySelector('#newVariantForm')
 		whereOnTheDom.insertBefore(this.btn, newVariantForm)
 		// create variantRequests instance of specificHttpReqs
 		// add click event listener to enter this variant (showUserWhereTheyAre, cleanChildrenArea, renderCssRules)
 	}
+
 	async showContent() {
 		console.log('set up the showContent() method for the variant selectors')
 	}
@@ -182,17 +209,59 @@ class EditAddVariantBtn {
 		this.newVariantBtn = document.createElement('input')
 		this.variantsArea = variantsArea
 	}
+
 	setUpForm() {
 		this.newVariantForm.autocomplete = 'off'
 		this.newVariantForm.id = 'newVariantForm'
 		this.addSubmitEventListenerToAddNewVariant()
 	}
+
+	setUpBtn() {
+		this.newVariantBtn.type = 'button'
+		this.newVariantBtn.value = '+'
+		this.newVariantBtn.id = 'newVariantBtn'
+		this.newVariantBtn.classList.add('add-variation-btn')
+		this.newVariantBtn.autocomplete = 'off'
+	}
+
+	setUpChangeBtnOnFocus() {
+		//
+		// Turning btn into input text on click
+		this.newVariantBtn.addEventListener('focusin', () => {
+			//
+			// The 1st variant it is automatically created w/ the default parameter: this.parentSelector
+			// If it's not the 1st, the user can choose the variant's name
+
+			const isTheFirstVariant = !document
+				.querySelector(`#${this.parentName}ParentSelector`)
+				.classList.contains('hasSomeVariant')
+
+			if (isTheFirstVariant) this.createVariant()
+			else this.changeBtnToInput()
+		})
+
+		// Turning input text back into btn on focusout
+		this.newVariantBtn.addEventListener('focusout', () => {
+			this.newVariantBtn.type = 'button'
+			this.newVariantBtn.value = '+'
+		})
+	}
+
+	changeBtnToInput() {
+		this.newVariantBtn.type = 'text'
+		this.newVariantBtn.value = ''
+		this.newVariantForm.focus()
+		this.newVariantBtn.focus()
+		this.newVariantBtn.select()
+	}
+
 	addSubmitEventListenerToAddNewVariant() {
 		this.newVariantForm.addEventListener('submit', e => {
 			e.preventDefault()
 			this.createVariant(this.newVariantBtn.value)
 		})
 	}
+
 	async createVariant(inputValue = this.parentName) {
 		try {
 			const res = await fetch(this.endpoint, {
@@ -210,58 +279,35 @@ class EditAddVariantBtn {
 			console.log(err)
 		}
 	}
+
 	receivePostResponse(dbVariants) {
-		const dbVariantsNames = Object.keys(dbVariants)
 		const domVariants = Array.from(document.querySelectorAll('.variantBtn'))
-		const domVariantsNames = domVariants.map(v => v.dataset.variantName)
-		const newName = dbVariantsNames.find(v => !domVariantsNames.includes(v))
+		const domVariantsNames = domVariants.map(dv => dv.dataset.variantName)
+
+		const dbVariantsNames = Object.keys(dbVariants)
+		const newName = dbVariantsNames.find(dbv => !domVariantsNames.includes(dbv))
+
 		const newVariant = new EditVariantSelector(
 			this.pieceType,
 			'cssRules',
 			this.parentName,
 			newName
 		)
+
 		newVariant.setUpSelectorBtn()
 		newVariant.addSelectorBtnToDom(this.variantsArea)
+
 		this.showThatThisParentSelectorNowHasVariants()
 		this.newVariantBtn.blur()
 	}
+
 	showThatThisParentSelectorNowHasVariants() {
-		const parentSelector = document.querySelector(
-			`#${this.parentName}ParentSelector`
-		)
+		const parentSelectorId = `#${this.parentName}ParentSelector`
+
+		const parentSelector = document.querySelector(parentSelectorId)
 		parentSelector.classList.add('hasSomeVariant')
 	}
-	setUpBtn() {
-		this.newVariantBtn.type = 'button'
-		this.newVariantBtn.value = '+'
-		this.newVariantBtn.id = 'newVariantBtn'
-		this.newVariantBtn.classList.add('add-variation-btn')
-		this.newVariantBtn.autocomplete = 'off'
-	}
-	setUpChangeBtnOnFocus() {
-		// Turning btn into input text on click
-		this.newVariantBtn.addEventListener('focusin', () => {
-			// If there isn't any variants on this.parentSelector, create variant with the parentName
-			const thereIsAlreadySomeVariant = document
-				.querySelector(`#${this.parentName}ParentSelector`)
-				.classList.contains('hasSomeVariant')
-			if (thereIsAlreadySomeVariant) this.changeBtnToInput()
-			else this.createVariant()
-		})
-		// Turning input text back into btn on focusout
-		this.newVariantBtn.addEventListener('focusout', () => {
-			this.newVariantBtn.type = 'button'
-			this.newVariantBtn.value = '+'
-		})
-	}
-	changeBtnToInput() {
-		this.newVariantBtn.type = 'text'
-		this.newVariantBtn.value = ''
-		this.newVariantForm.focus()
-		this.newVariantBtn.focus()
-		this.newVariantBtn.select()
-	}
+
 	appendBtnToForm() {
 		this.newVariantForm.appendChild(this.newVariantBtn)
 	}
