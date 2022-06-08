@@ -1,4 +1,11 @@
 class EditPieceType {
+	// 
+	// When the page is loaded, we create an instance of this EditPieceType class for each piece type on the sidebar, then we add an event listener to render its content when it's clicked.
+
+	// When one of these buttons are clicked, if it leads to a different section, we need to render that content to the user. So first we show the user where they are now, then we clean any content that's currently where we will place new content, and finally we show the parent selectors belonging to that piece type.
+
+	// But in order to show the parent selectors on the screen, we first need to get them on our database through a get request to our server.
+
 	constructor(pieceType) {
 		this.pieceType = pieceType
 		this.endpoint = `/api/pieces/elements/${this.pieceType.toLowerCase()}`
@@ -7,25 +14,15 @@ class EditPieceType {
 		this.childrenArea = document.querySelector(`#${this.childrenLevel}Area`)
 	}
 
-	async sendGetRequest() {
-		try {
-			const res = await fetch(this.endpoint, {
-				method: 'GET',
-				headers: { 'Content-Type': 'application/json' },
-			})
-			const data = await res.json()
-			return data
-		} catch (err) {
-			console.log(err)
-		}
-	}
-
 	addEventListenerToRenderContent() {
 		const boundRenderContent = this.renderContent.bind(this)
 		this.btn.addEventListener('click', boundRenderContent)
 	}
 
-	renderContent() {
+	renderContent(e) {
+		const isAlreadyBeingShown = e.target.classList.contains('current-place')
+		if (isAlreadyBeingShown) return
+
 		this.showUserWhereTheyAre()
 		this.cleanChildrenArea()
 		this.showContent()
@@ -38,8 +35,8 @@ class EditPieceType {
 		this.btn.classList.add('current-place')
 	}
 
-	cleanChildrenArea() {
-		const childrenArea = document.querySelector(`#${this.childrenLevel}Area`)
+	cleanChildrenArea(childrenAreaIdHandle = this.childrenLevel) {
+		const childrenArea = document.querySelector(`#${childrenAreaIdHandle}Area`)
 
 		while (childrenArea.lastChild) {
 			childrenArea.removeChild(childrenArea.lastChild)
@@ -58,15 +55,28 @@ class EditPieceType {
 				parentName
 			)
 
-			parentSelector.setUpSelectorBtn()
-			parentSelector.markSelectorBtnIfCustomized(allParents[parentName])
-			parentSelector.addSelectorBtnToDom(this.childrenArea)
-			parentSelector.addEventListenerToRenderContent()
+			parentSelector.renderSelector(this.childrenArea, allParents[parentName])
+		}
+	}
+
+	async sendGetRequest() {
+		try {
+			const res = await fetch(this.endpoint, {
+				method: 'GET',
+				headers: { 'Content-Type': 'application/json' },
+			})
+			const data = await res.json()
+			return data
+		} catch (err) {
+			console.log(err)
 		}
 	}
 }
 
 class EditSelector extends EditPieceType {
+	// 
+	// This is an in-between class and it shouldn't be instantiated. It is used to set the standards for how its 2 child classes should be structured and abstract their common components out of them.
+
 	constructor(pieceType, childrenLevel, parentName) {
 		super(pieceType)
 
@@ -75,6 +85,12 @@ class EditSelector extends EditPieceType {
 		this.childrenLevel = childrenLevel
 		this.childrenArea = document.querySelector(`#${childrenLevel}Area`)
 		this.parentName = parentName
+	}
+
+	renderSelector(whereOnTheDom) {
+		this.setUpSelectorBtn()
+		this.addEventListenerToRenderContent()
+		this.addSelectorBtnToDom(whereOnTheDom)
 	}
 
 	setUpSelectorBtn() {
@@ -91,17 +107,24 @@ class EditSelector extends EditPieceType {
 }
 
 class EditParentSelector extends EditSelector {
+	// 
+	// When the page is loaded, we create an instance of this EditPieceType class for each piece type on the sidebar, then we add an event listener to render its content when it's clicked.
+
+	// When one of these buttons are clicked, if it leads to a different section, we need to render that content to the user. So first we show the user where they are now, then we clean any content that's currently where we will place new content, and finally we show the parent selectors belonging to that piece type.
+
+	// But in order to show the parent selectors on the screen, we first need to get them on our database through a get request to our server.
+
 	constructor(pieceType, childrenLevel, parentName) {
 		super(pieceType, childrenLevel, parentName)
 	}
 
-	/* Later: try to put this method inside this.setUpSelectorBtn() */
-	markSelectorBtnIfCustomized(selectorObj) {
-		const selectorIsCustomized = Object.keys(selectorObj).length
-		if (selectorIsCustomized) this.btn.classList.add('hasSomeVariant')
+	// Methods from the prototype that will be modified
+	renderSelector(whereOnTheDom, selectorObj) {
+		super.renderSelector(whereOnTheDom)
+
+		this.markSelectorBtnIfCustomized(selectorObj)
 	}
 
-	// Methods from the prototype that will be modified
 	setUpSelectorBtn() {
 		this.btn.classList.add('tag-btn')
 		this.btn.id = `${this.parentName}ParentSelector`
@@ -110,6 +133,12 @@ class EditParentSelector extends EditSelector {
 
 	addSelectorBtnToDom(whereOnTheDom) {
 		whereOnTheDom.appendChild(this.btn)
+	}
+
+	cleanChildrenArea() {
+		super.cleanChildrenArea() /* this one gets called with the default parameter = this.childrenLevel */
+		super.cleanChildrenArea('variantLabels')
+		// We may need to clean more areas here
 	}
 
 	async showContent() {
@@ -126,13 +155,17 @@ class EditParentSelector extends EditSelector {
 				variantName
 			)
 
-			variantSelector.setUpSelectorBtn()
-			variantSelector.addSelectorBtnToDom(this.childrenArea)
-			variantSelector.addEventListenerToRenderContent()
+			variantSelector.renderSelector(this.childrenArea)
 		}
 
 		this.makeVariantsLineVisible()
 		this.makeEditingAreaVisible()
+	}
+
+	// Method needed for this.renderSelector()
+	markSelectorBtnIfCustomized(selectorObj) {
+		const selectorIsCustomized = Object.keys(selectorObj).length
+		if (selectorIsCustomized) this.btn.classList.add('hasSomeVariant')
 	}
 
 	// Methods needed for this.showContent()
@@ -196,7 +229,28 @@ class EditVariantSelector extends EditSelector {
 	}
 
 	async showContent() {
-		console.log('set up the showContent() method for the variant selectors')
+		console.log(
+			'Please set up the showContent() method for the variant selectors'
+		)
+	}
+
+	showUserWhereTheyAre() {
+		// Other: need to make variant selector have the event listener of show the label right when it's created
+		this.btn.classList.add('current-place')
+
+		const variantLabel = document.createElement('span')
+		variantLabel.classList.add('variation-label')
+		variantLabel.id = this.variantName /* Is this needed? */
+		variantLabel.innerText = this.btn.innerText
+
+		variantLabel.addEventListener('click', e => {
+			e.target.remove()
+
+			this.btn.classList.remove('current-place')
+		})
+
+		const variantLabelsArea = document.querySelector('#variantLabelsArea')
+		variantLabelsArea.appendChild(variantLabel)
 	}
 }
 
@@ -258,6 +312,7 @@ class EditAddVariantBtn {
 	addSubmitEventListenerToAddNewVariant() {
 		this.newVariantForm.addEventListener('submit', e => {
 			e.preventDefault()
+
 			this.createVariant(this.newVariantBtn.value)
 		})
 	}
@@ -294,8 +349,7 @@ class EditAddVariantBtn {
 			newName
 		)
 
-		newVariant.setUpSelectorBtn()
-		newVariant.addSelectorBtnToDom(this.variantsArea)
+		newVariant.renderSelector(this.variantsArea)
 
 		this.showThatThisParentSelectorNowHasVariants()
 		this.newVariantBtn.blur()

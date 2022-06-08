@@ -71,15 +71,15 @@
 					<span class="pieces-category-name editSidebarElementsListToggle open"
 						>Elements</span
 					>
-					<li>
+					<li data-btn-content="Typography">
 						<button id="editGetTypographyBtn" class="editType">
 							Typography
 						</button>
 					</li>
-					<li><button>Spacing</button></li>
-					<li><button>Buttons</button></li>
-					<li><button>Form fields</button></li>
-					<li><button>Add element type</button></li>
+					<li data-btn-content="Spacing"><button>Spacing</button></li>
+					<li data-btn-content="Buttons"><button>Buttons</button></li>
+					<li data-btn-content="Form Fields"><button>Form fields</button></li>
+					<li data-btn-content="+"><button>Add element type</button></li>
 				</ul>
 				<ul class="pieces-category closed">
 					<span
@@ -105,20 +105,11 @@
 					<div id="variantsArea" class="variations variants hidden"></div>
 				</div>
 				<div id="editingArea" class="editing-area hidden">
-					<div class="rules-area"></div>
+					<div class="rules-area">
+						<div id="cssRulesArea"></div>
+					</div>
 					<div class="rendering-area">
-						<div class="variants-shown">
-							<span id="" class="variation-label"
-								>&lt;h1&gt; .bright-bg<span class="close-variation-label"
-									>x</span
-								></span
-							>
-							<span id="" class="variation-label"
-								>&lt;h1&gt; .bright-bg<span class="close-variation-label"
-									>x</span
-								></span
-							>
-						</div>
+						<div id="variantLabelsArea" class="variants-shown"></div>
 						<div class="render">
 							<h1>Lorem ipsum dolor sit amet, consectetur adipsing elit</h1>
 						</div>

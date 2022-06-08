@@ -118,9 +118,9 @@
 	border-right: 0;
 }
 
-.close-variation-label {
+.variation-label::after {
+	content: 'x';
 	font-size: var(--small-font-size);
-	background-color: var(--edit-main-selector-label-close-color);
 	position: relative;
 	top: -0.75px;
 	padding: calc(var(--step) - 1.25px) var(--half-step);
@@ -128,8 +128,8 @@
 	margin-left: var(--half-step);
 }
 
-.close-variation-label:hover {
-	background-color: var(--edit-main-selector-label-close-hover-color);
+.variation-label:hover::after {
+	background-color: var(--edit-main-selector-label-close-color);
 }
 
 .render {
