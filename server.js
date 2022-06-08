@@ -104,7 +104,8 @@ function processRequest(req, res, method) {
 
 	// Deleting the element
 	const methodIsDelete = method === 'DELETE'
-	if (methodIsDelete && variantDoesExist) delete piecesOfSelectorInDb[variantName]
+	if (methodIsDelete && variantDoesExist)
+		delete piecesOfSelectorInDb[variantName]
 
 	res.json(piecesOfSelectorInDb)
 }
@@ -119,7 +120,10 @@ app.post(EDIT_PARENTSELECTOR_ENDPOINT, (req, res) =>
 	processRequest(req, res, 'POST')
 )
 // app.put(ELEMENTS_ENDPOINT, (req, res) => processRequest(req, res, 'PUT'))
-// app.delete(ELEMENTS_ENDPOINT, (req, res) => processRequest(req, res, 'DELETE'))
+
+app.delete(EDIT_PARENTSELECTOR_ENDPOINT, (req, res) =>
+	processRequest(req, res, 'DELETE')
+)
 
 // Turning on the server
 app.listen(PORT, () => {

@@ -89,6 +89,7 @@ class EditSelector extends EditPieceType {
 
 	renderSelector(whereOnTheDom) {
 		this.setUpSelectorBtn()
+		this.addEventListenerForTheContextMenu()
 		this.addEventListenerToRenderContent()
 		this.addSelectorBtnToDom(whereOnTheDom)
 	}
@@ -103,6 +104,74 @@ class EditSelector extends EditPieceType {
 
 	showContent() {
 		console.log('Please set up showContent() on the child class')
+	}
+
+	addEventListenerForTheContextMenu() {
+		const boundOpenContextMenu = this.openContextMenu.bind(this)
+		this.btn.addEventListener('contextmenu', boundOpenContextMenu)
+	}
+
+	openContextMenu(e) {
+		e.preventDefault()
+
+		const contextClicked = e.target.dataset.context
+		if (!contextClicked) return
+
+		const contextMenu = document.querySelector(`#contextMenu${contextClicked}`)
+		contextMenu.classList.add('active')
+		contextMenu.style.top = e.pageY + 'px'
+		contextMenu.style.left = e.pageX + 'px'
+
+		this.setUpContextMenuBtns()
+	}
+
+	setUpContextMenuBtns() {
+		// Delete button
+		const deleteSelectorBtn = document.querySelector('#delete-selector')
+		const boundDeleteCustomSelector = this.deleteCustomSelector.bind(this)
+		deleteSelectorBtn.addEventListener('click', boundDeleteCustomSelector)
+	}
+
+	async deleteCustomSelector() {
+		const deleteResponse = await this.sendDeleteRequest()
+		this.receiveDeleteResponse(deleteResponse)
+	}
+
+	async sendDeleteRequest() {
+		try {
+			const res = await fetch(this.endpoint, {
+				method: 'DELETE',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					variantName: `${this.variantName}`,
+				}),
+			})
+			const data = await res.json()
+			return data
+		} catch (err) {
+			console.log(err)
+		}
+	}
+
+	receiveDeleteResponse(remainingVariantsInDb) {
+		// This needs to be updated when it's time to add the feature of deleting custom selectors at the parent level
+		const selectorArea = document.querySelector(`#${'variants'}Area`)
+		const domVariants = Array.from(
+			selectorArea.querySelectorAll(`[data-context=CustomSelector]`)
+		)
+
+		const deletedFromDb = domVariants.find(
+			variant => !(variant in Object.keys(remainingVariantsInDb))
+		)
+
+		console.log(deletedFromDb)
+		deletedFromDb.remove()
+
+		// there is some bugs, like sometimes it deletes the wrong button and sometimes it deletes 2 btns
+		// need to make the context menu disappear after a click inside or outside it (check ig saved post)
+		// need to stop trying to add the remove method in a event listener when there's no more btns
+		// need to delete children
+		// need to delete from show user where they are
 	}
 }
 
@@ -212,8 +281,8 @@ class EditVariantSelector extends EditSelector {
 	setUpSelectorBtn() {
 		this.btn.classList.add('variation-btn')
 		this.btn.id = `${this.variantName}VariantSelector`
-		this.btn.dataset.context = 'CustomSelector'
 		this.btn.classList.add('variantBtn')
+		this.btn.dataset.context = 'CustomSelector'
 		this.btn.dataset.variantName = this.variantName
 
 		this.btn.innerText =
@@ -236,7 +305,6 @@ class EditVariantSelector extends EditSelector {
 	}
 
 	showUserWhereTheyAre() {
-		// Other: need to make variant selector have the event listener of show the label right when it's created
 		this.btn.classList.add('current-place')
 
 		const variantLabel = document.createElement('span')
@@ -251,33 +319,6 @@ class EditVariantSelector extends EditSelector {
 
 		const variantLabelsArea = document.querySelector('#variantLabelsArea')
 		variantLabelsArea.appendChild(variantLabel)
-	}
-
-	async deleteVariant() {
-		const deleteResponse = await this.sendDeleteRequest()
-		this.receiveDeleteResponse(deleteResponse)
-	}
-
-	async sendDeleteRequest() {
-		try {
-			const res = await fetch(this.endpoint, {
-				method: 'DELETE',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					variantName: `${this.variantName}`,
-				}),
-			})
-			const data = await res.json()
-			console.log(data)
-			return data
-		} catch (err) {
-			console.log(err)
-		}
-	}
-
-	receiveDeleteResponse(remainingVariantsInDb) {
-		// document.querySelectorAll()
-		return
 	}
 }
 
