@@ -1,5 +1,5 @@
 class EditPieceType {
-	// 
+	//
 	// When the page is loaded, we create an instance of this EditPieceType class for each piece type on the sidebar, then we add an event listener to render its content when it's clicked.
 
 	// When one of these buttons are clicked, if it leads to a different section, we need to render that content to the user. So first we show the user where they are now, then we clean any content that's currently where we will place new content, and finally we show the parent selectors belonging to that piece type.
@@ -74,7 +74,7 @@ class EditPieceType {
 }
 
 class EditSelector extends EditPieceType {
-	// 
+	//
 	// This is an in-between class and it shouldn't be instantiated. It is used to set the standards for how its 2 child classes should be structured and abstract their common components out of them.
 
 	constructor(pieceType, childrenLevel, parentName) {
@@ -107,7 +107,7 @@ class EditSelector extends EditPieceType {
 }
 
 class EditParentSelector extends EditSelector {
-	// 
+	//
 	// When the page is loaded, we create an instance of this EditPieceType class for each piece type on the sidebar, then we add an event listener to render its content when it's clicked.
 
 	// When one of these buttons are clicked, if it leads to a different section, we need to render that content to the user. So first we show the user where they are now, then we clean any content that's currently where we will place new content, and finally we show the parent selectors belonging to that piece type.
@@ -212,6 +212,7 @@ class EditVariantSelector extends EditSelector {
 	setUpSelectorBtn() {
 		this.btn.classList.add('variation-btn')
 		this.btn.id = `${this.variantName}VariantSelector`
+		this.btn.dataset.context = 'CustomSelector'
 		this.btn.classList.add('variantBtn')
 		this.btn.dataset.variantName = this.variantName
 
@@ -240,7 +241,6 @@ class EditVariantSelector extends EditSelector {
 
 		const variantLabel = document.createElement('span')
 		variantLabel.classList.add('variation-label')
-		variantLabel.id = this.variantName /* Is this needed? */
 		variantLabel.innerText = this.btn.innerText
 
 		variantLabel.addEventListener('click', e => {
@@ -251,6 +251,33 @@ class EditVariantSelector extends EditSelector {
 
 		const variantLabelsArea = document.querySelector('#variantLabelsArea')
 		variantLabelsArea.appendChild(variantLabel)
+	}
+
+	async deleteVariant() {
+		const deleteResponse = await this.sendDeleteRequest()
+		this.receiveDeleteResponse(deleteResponse)
+	}
+
+	async sendDeleteRequest() {
+		try {
+			const res = await fetch(this.endpoint, {
+				method: 'DELETE',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					variantName: `${this.variantName}`,
+				}),
+			})
+			const data = await res.json()
+			console.log(data)
+			return data
+		} catch (err) {
+			console.log(err)
+		}
+	}
+
+	receiveDeleteResponse(remainingVariantsInDb) {
+		// document.querySelectorAll()
+		return
 	}
 }
 

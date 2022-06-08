@@ -21,17 +21,21 @@ class File {
 app.get('/', (_, res) => res.sendFile(__dirname + '/index.html'))
 const cssNormalize = new File('/css/normalize.css')
 const cssStyle = new File('/css/style.css')
+const cssContextMenus = new File('/css/context-menus.css')
 const cssAppHeader = new File('/css/app-header.css')
 const cssEditSidebar = new File('/css/edit-sidebar.css')
 const cssWorkingArea = new File('/css/working-area.css')
 const jsMain = new File('/js/main.js')
+const jsContextMenus = new File('/js/context-menus.js')
 const jsSidebar = new File('/js/sidebar.js')
 cssNormalize.serveFile()
 cssStyle.serveFile()
+cssContextMenus.serveFile()
 cssAppHeader.serveFile()
 cssEditSidebar.serveFile()
 cssWorkingArea.serveFile()
 jsMain.serveFile()
+jsContextMenus.serveFile()
 jsSidebar.serveFile()
 
 // Creating and serving image files
@@ -39,10 +43,14 @@ const homeIcon = new File('/assets/home-icon.svg')
 const profilePic = new File('/assets/profile-picture.svg')
 const clientPic = new File('/assets/client-picture.svg')
 const chevronIcon = new File('/assets/right-chevron.svg')
+const thrashIcon = new File('/assets/thrash-icon.svg')
+const closeIcon = new File('/assets/close-icon.svg')
 homeIcon.serveFile()
 profilePic.serveFile()
 clientPic.serveFile()
 chevronIcon.serveFile()
+thrashIcon.serveFile()
+closeIcon.serveFile()
 
 // API endpoints
 const EDIT_PIECETYPE_ENDPOINT = '/api/pieces/elements/:type'
@@ -94,9 +102,9 @@ function processRequest(req, res, method) {
 	// const methodIsPut = method === 'PUT'
 	// if (methodIsPut && elemExists) elementsWithTag[name].cssProps = cssProps
 
-	// // Deleting the element
-	// const methodIsDelete = method === 'DELETE'
-	// if (methodIsDelete && elemExists) delete elementsWithTag[name]
+	// Deleting the element
+	const methodIsDelete = method === 'DELETE'
+	if (methodIsDelete && variantDoesExist) delete piecesOfSelectorInDb[variantName]
 
 	res.json(piecesOfSelectorInDb)
 }

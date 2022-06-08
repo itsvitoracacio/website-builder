@@ -9,6 +9,7 @@
 		<!-- Importing stylesheets -->
 		<link rel="stylesheet" href="/css/normalize.css" />
 		<link rel="stylesheet" href="/css/style.css" />
+		<link rel="stylesheet" href="/css/context-menus.css" />
 		<link rel="stylesheet" href="/css/app-header.css" />
 		<link rel="stylesheet" href="/css/edit-sidebar.css" />
 		<link rel="stylesheet" href="/css/working-area.css" />
@@ -128,7 +129,15 @@
 				</div>
 			</section>
 		</main>
+		<div class="context-menus">
+			<div id="contextMenuCustomSelector" class="context-menu" data-custom-selector="">
+				<ul>
+					<li id="delete-selector" class="delete">Delete</li>
+				</ul>
+			</div>
+		</div>
 		<script src="/js/main.js"></script>
+		<script src="/js/context-menus.js"></script>
 		<script src="/js/sidebar.js"></script>
 	</body>
 </html>

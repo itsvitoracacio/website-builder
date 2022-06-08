@@ -1,0 +1,31 @@
+.context-menu {
+	position: fixed;
+	z-index: 1;
+	background-color: var(--primary-color);
+	font-size: 12px;
+	transform: scale(0);
+	transform-origin: top left;
+}
+
+.context-menu.active {
+	transform: scale(1);
+	transition: transform 200ms ease-in-out;
+}
+
+.context-menu li {
+	display: flex;
+	align-items: center;
+	column-gap: 0.5rem;
+	color: var(--text-color-on-primary-bg);
+	line-height: 0.8;
+	padding: 0.5rem 2rem 0.5rem 0.5rem;
+}
+
+.context-menu li:hover {
+	background-color: var(--hover-color-on-primary-bg);
+}
+
+.context-menu li.delete::before {
+	content: url(/assets/thrash-icon.svg);
+	display: inline-block;
+}
