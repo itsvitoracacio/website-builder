@@ -75,7 +75,7 @@ class EditPieceType {
 
 class EditSelector extends EditPieceType {
 	//
-	// This is an in-between class and it shouldn't be instantiated. It is used to set the standards for how its 2 child classes should be structured and abstract their common components out of them.
+	// This is an in-between class and it shouldn't be instantiated. It is used strictly to abstract the common components (properties and methods) out of its two child classes.
 
 	constructor(pieceType, childrenLevel, parentName) {
 		super(pieceType)
@@ -89,9 +89,10 @@ class EditSelector extends EditPieceType {
 
 	renderSelector(whereOnTheDom) {
 		this.setUpSelectorBtn()
-		this.addEventListenerForTheContextMenu()
 		this.addEventListenerToRenderContent()
 		this.addSelectorBtnToDom(whereOnTheDom)
+
+		if (this.btn.dataset.context) this.addEventListenerForTheContextMenu()
 	}
 
 	setUpSelectorBtn() {
@@ -102,76 +103,22 @@ class EditSelector extends EditPieceType {
 		console.log('Please set up addSelectorBtnToDom() on the child class')
 	}
 
-	showContent() {
-		console.log('Please set up showContent() on the child class')
-	}
-
 	addEventListenerForTheContextMenu() {
-		const boundOpenContextMenu = this.openContextMenu.bind(this)
+		const contextMenu = new VariantContextMenu(
+			this.pieceType,
+			this.endpoint,
+			this.parentName,
+			this.variantName
+		)
+
+		contextMenu.createContextMenu()
+
+		const boundOpenContextMenu = contextMenu.openContextMenu.bind(contextMenu)
 		this.btn.addEventListener('contextmenu', boundOpenContextMenu)
 	}
 
-	openContextMenu(e) {
-		e.preventDefault()
-
-		const contextClicked = e.target.dataset.context
-		if (!contextClicked) return
-
-		const contextMenu = document.querySelector(`#contextMenu${contextClicked}`)
-		contextMenu.classList.add('active')
-		contextMenu.style.top = e.pageY + 'px'
-		contextMenu.style.left = e.pageX + 'px'
-
-		this.setUpContextMenuBtns()
-	}
-
-	setUpContextMenuBtns() {
-		// Delete button
-		const deleteSelectorBtn = document.querySelector('#delete-selector')
-		const boundDeleteCustomSelector = this.deleteCustomSelector.bind(this)
-		deleteSelectorBtn.addEventListener('click', boundDeleteCustomSelector)
-	}
-
-	async deleteCustomSelector() {
-		const deleteResponse = await this.sendDeleteRequest()
-		this.receiveDeleteResponse(deleteResponse)
-	}
-
-	async sendDeleteRequest() {
-		try {
-			const res = await fetch(this.endpoint, {
-				method: 'DELETE',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					variantName: `${this.variantName}`,
-				}),
-			})
-			const data = await res.json()
-			return data
-		} catch (err) {
-			console.log(err)
-		}
-	}
-
-	receiveDeleteResponse(remainingVariantsInDb) {
-		// This needs to be updated when it's time to add the feature of deleting custom selectors at the parent level
-		const selectorArea = document.querySelector(`#${'variants'}Area`)
-		const domVariants = Array.from(
-			selectorArea.querySelectorAll(`[data-context=CustomSelector]`)
-		)
-
-		const deletedFromDb = domVariants.find(
-			variant => !(variant in Object.keys(remainingVariantsInDb))
-		)
-
-		console.log(deletedFromDb)
-		deletedFromDb.remove()
-
-		// there is some bugs, like sometimes it deletes the wrong button and sometimes it deletes 2 btns
-		// need to make the context menu disappear after a click inside or outside it (check ig saved post)
-		// need to stop trying to add the remove method in a event listener when there's no more btns
-		// need to delete children
-		// need to delete from show user where they are
+	showContent() {
+		console.log('Please set up showContent() on the child class')
 	}
 }
 
@@ -283,7 +230,7 @@ class EditVariantSelector extends EditSelector {
 		this.btn.id = `${this.variantName}VariantSelector`
 		this.btn.classList.add('variantBtn')
 		this.btn.dataset.context = 'CustomSelector'
-		this.btn.dataset.variantName = this.variantName
+		this.btn.dataset.selectorName = this.variantName
 
 		this.btn.innerText =
 			this.variantName === this.parentName
@@ -405,7 +352,7 @@ class EditAddVariantBtn {
 
 	receivePostResponse(dbVariants) {
 		const domVariants = Array.from(document.querySelectorAll('.variantBtn'))
-		const domVariantsNames = domVariants.map(dv => dv.dataset.variantName)
+		const domVariantsNames = domVariants.map(dv => dv.dataset.selectorName)
 
 		const dbVariantsNames = Object.keys(dbVariants)
 		const newName = dbVariantsNames.find(dbv => !domVariantsNames.includes(dbv))
@@ -432,6 +379,246 @@ class EditAddVariantBtn {
 
 	appendBtnToForm() {
 		this.newVariantForm.appendChild(this.newVariantBtn)
+	}
+}
+
+class ContextMenu {
+	constructor(pieceType, endpoint, parentName, selectorName) {
+		this.pieceType = pieceType
+		this.endpoint = endpoint
+		this.parentName = parentName
+		this.selectorName = selectorName
+		this.clickEvent = ''
+		this.contextMenu = document.createElement('div')
+	}
+
+	set setClickEvent(clickEvent) {
+		this.clickEvent = clickEvent
+	}
+
+	createContextMenu() {
+		console.log('Please define setUpContextMenu() on the child class')
+	}
+
+	openContextMenu(event) {
+		// Preventing the browser from opening the default window context menu
+		event.preventDefault()
+
+		// If there's no context menu attached to the click target, do nothing
+		const contextClicked = event.target.dataset.context
+		if (!contextClicked) return
+
+		// Setting the this.clickEvent property now that a click event happened
+		this.setClickEvent = event
+
+		// Setting up the actions inside the context menu and the possibility of closing it
+		this.setUpContextMenuBtns()
+		this.detectClickWhileContextMenuIsOpen()
+
+		// Showing the context menu to the user
+		this.showContextMenu()
+	}
+
+	setUpContextMenuBtns() {
+		console.log('Please set up setUpContextMenuBtns() on the child class')
+	}
+
+	detectClickWhileContextMenuIsOpen() {
+		const boundCloseContextMenu = this.closeContextMenu.bind(this)
+		document.addEventListener('click', boundCloseContextMenu)
+	}
+
+	closeContextMenu() {
+		// Selecting all context menus on the page
+		const contextMenus = Array.from(document.querySelectorAll('.context-menu'))
+
+		// Determining which one is active, and closing it
+		const activeCM = contextMenus.find(cm => cm.classList.contains('active'))
+		if (activeCM) activeCM.classList.remove('active')
+
+		// Preventing the function from running while there's no context menu open
+		document.removeEventListener('click', this.closeContextMenu)
+	}
+
+	showContextMenu() {
+		this.closeContextMenu()
+
+		this.contextMenu.classList.add('active')
+		this.contextMenu.style.top = this.clickEvent.pageY + 'px'
+		this.contextMenu.style.left = this.clickEvent.pageX + 'px'
+	}
+}
+
+class CustomSelectorContextMenu extends ContextMenu {
+	constructor(pieceType, endpoint, parentName, selectorName) {
+		super(pieceType, endpoint, parentName, selectorName)
+	}
+
+	// Methods from the prototype that need to be modified
+	createContextMenu() {
+		this.contextMenu.id = 'contextMenuCustomSelector'
+		this.contextMenu.classList.add('context-menu')
+		this.contextMenu.dataset.customSelector = this.selectorName
+
+		const menuList = document.createElement('ul')
+
+		const deleteOption = document.createElement('li')
+		deleteOption.id = 'delete-selector'
+		deleteOption.classList.add('delete')
+		deleteOption.innerText = 'Delete'
+
+		const contextMenusArea = document.querySelector('.context-menus')
+
+		menuList.appendChild(deleteOption)
+		this.contextMenu.appendChild(menuList)
+		contextMenusArea.appendChild(this.contextMenu)
+	}
+
+	setUpContextMenuBtns() {
+		// Delete button
+		this.includeDeleteSelectorBtn()
+	}
+
+	// Methods of its own
+	includeDeleteSelectorBtn() {
+		console.log('Please set up includeDeleteSelectorBtn() on the child class')
+
+		// This needs to be declared on the child classes because of the .bind() method, but on both child classes it will have the exact following code:
+
+		// // const boundCheckBeforeDeleting = this.checkBeforeDeleting.bind(this)
+		// // const deleteSelectorBtn = this.contextMenu.querySelector('#delete-selector')
+		// // deleteSelectorBtn.addEventListener('click', boundCheckBeforeDeleting)
+	}
+
+	// Methods needed for includeDeleteSelectorBtn()
+	checkBeforeDeleting() {
+		console.log('Please set up checkBeforeDeleting() on the child class')
+
+		this.deleteCustomSelector()
+	}
+
+	async deleteCustomSelector() {
+		const deleteResponse = await this.sendDeleteRequest()
+		const selectorToDelete = this.determineSelectorToDelete(deleteResponse)
+
+		this.removeSelectorContent()
+		this.stopShowingSelectorAnywhereElse()
+		selectorToDelete.remove() /* removing from the dom */
+	}
+
+	async sendDeleteRequest() {
+		try {
+			const res = await fetch(this.endpoint, {
+				method: 'DELETE',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					variantName: `${this.selectorName}`,
+				}),
+			})
+			const data = await res.json()
+			return data
+		} catch (err) {
+			console.log(err)
+		}
+	}
+
+	determineSelectorToDelete(remainingVariantsInDb) {
+		// Comparing the current dom selectors to the current db selectors. The one missing should be removed
+		const selectorArea = document.querySelector(`#${this.siblingsArea}Area`)
+		const query = '[data-context=CustomSelector]'
+
+		const domSelectors = Array.from(selectorArea.querySelectorAll(query))
+		const domSNames = domSelectors.map(domS => domS.dataset.selectorName)
+
+		// Determining which dom selector needs to be removed from the variants area
+		const nameOfSelectorDeletedFromDb = domSNames.find(
+			domSName => !(domSName in remainingVariantsInDb)
+		)
+
+		const selectorToDelete = domSelectors.find(
+			domS => domS.dataset.selectorName === nameOfSelectorDeletedFromDb
+		)
+
+		return selectorToDelete
+	}
+
+	stopShowingSelectorAnywhereElse() {
+		console.log(
+			'Please set up stopShowingSelectorAnywhereElse() on the child class'
+		)
+	}
+
+	removeSelectorContent() {
+		console.log('Please set up removeSelectorContent() on the child class')
+	}
+}
+
+class VariantContextMenu extends CustomSelectorContextMenu {
+	constructor(pieceType, endpoint, parentName, selectorName) {
+		super(pieceType, endpoint, parentName, selectorName)
+		this.siblingsArea = 'variants'
+	}
+
+	// Methods from the prototype that need to be modified
+	includeDeleteSelectorBtn() {
+		const boundCheckBeforeDeleting = this.checkBeforeDeleting.bind(this)
+		const deleteSelectorBtn = this.contextMenu.querySelector('#delete-selector')
+
+		deleteSelectorBtn.addEventListener('click', boundCheckBeforeDeleting)
+	}
+
+	checkBeforeDeleting() {
+		// The first variant selector should only be deleted if it's the only one remaining
+		const isTheFirstVariantSelector = this.parentName === this.selectorName
+
+		const variantBtns = Array.from(document.querySelectorAll('.variantBtn'))
+		const isTheOnlyOneRemaining = variantBtns.length === 1
+
+		// To demonstrate the bug, remove the bang(!) below
+		if (isTheFirstVariantSelector && !isTheOnlyOneRemaining) {
+			console.log("The first variant is only deleted if it's the only one")
+			return
+		}
+
+		this.deleteCustomSelector()
+	}
+
+	stopShowingSelectorAnywhereElse() {
+		// Both of these methods have a checker inside them to see if they need to run
+		this.changeColorOfParentSelectorToNoVariants()
+		this.removeFromLabelsArea()
+	}
+
+	removeSelectorContent() {
+		console.log('Please set up removeSelectorContent()')
+	}
+
+	// Methods needed for this.stopShowingSelectorAnywhereElse()
+	changeColorOfParentSelectorToNoVariants() {
+		const variantsArea = document.querySelector('#variantsArea')
+		const variantBtns = Array.from(variantsArea.querySelectorAll('button'))
+
+		const noVariantsAnymore = variantBtns.length <= 1
+		if (!noVariantsAnymore) return
+
+		const query = `#${this.parentName}ParentSelector`
+		const parentSelector = document.querySelector(query)
+		parentSelector.classList.remove('hasSomeVariant')
+	}
+
+	removeFromLabelsArea() {
+		const selectorFullName = this.clickEvent.target.innerText
+
+		const variantLabelsArea = document.querySelector('#variantLabelsArea')
+		const vLabels = Array.from(variantLabelsArea.children)
+		const vlNames = vLabels.map(vl => vl.innerText)
+
+		const labelIsShowing = vlNames.find(name => name === selectorFullName)
+
+		if (!labelIsShowing) return
+
+		const labelToDelete = vLabels.find(l => l.innerText === labelIsShowing)
+		labelToDelete.remove()
 	}
 }
 
