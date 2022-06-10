@@ -112,6 +112,8 @@ class EditSelector extends EditPieceType {
 		)
 
 		contextMenu.createContextMenu()
+		contextMenu.setUpContextMenuBtns()
+		contextMenu.detectClickWhileContextMenuIsOpen()
 
 		const boundOpenContextMenu = contextMenu.openContextMenu.bind(contextMenu)
 		this.btn.addEventListener('contextmenu', boundOpenContextMenu)
@@ -124,7 +126,8 @@ class EditSelector extends EditPieceType {
 
 class EditParentSelector extends EditSelector {
 	//
-	// When the page is loaded, we create an instance of this EditPieceType class for each piece type on the sidebar, then we add an event listener to render its content when it's clicked.
+	// When the user goes into an EditPieceType page, we load all
+	// create an instance of this EditPieceType class for each piece type on the sidebar, then we add an event listener to render its content when it's clicked.
 
 	// When one of these buttons are clicked, if it leads to a different section, we need to render that content to the user. So first we show the user where they are now, then we clean any content that's currently where we will place new content, and finally we show the parent selectors belonging to that piece type.
 
@@ -411,10 +414,6 @@ class ContextMenu {
 		// Setting the this.clickEvent property now that a click event happened
 		this.setClickEvent = event
 
-		// Setting up the actions inside the context menu and the possibility of closing it
-		this.setUpContextMenuBtns()
-		this.detectClickWhileContextMenuIsOpen()
-
 		// Showing the context menu to the user
 		this.showContextMenu()
 	}
@@ -434,10 +433,11 @@ class ContextMenu {
 
 		// Determining which one is active, and closing it
 		const activeCM = contextMenus.find(cm => cm.classList.contains('active'))
-		if (activeCM) activeCM.classList.remove('active')
-
-		// Preventing the function from running while there's no context menu open
-		document.removeEventListener('click', this.closeContextMenu)
+		if (activeCM) {
+			activeCM.classList.remove('active')
+			activeCM.style.top = ''
+			activeCM.style.left = ''
+		}
 	}
 
 	showContextMenu() {
@@ -574,7 +574,6 @@ class VariantContextMenu extends CustomSelectorContextMenu {
 		const variantBtns = Array.from(document.querySelectorAll('.variantBtn'))
 		const isTheOnlyOneRemaining = variantBtns.length === 1
 
-		// To demonstrate the bug, remove the bang(!) below
 		if (isTheFirstVariantSelector && !isTheOnlyOneRemaining) {
 			console.log("The first variant is only deleted if it's the only one")
 			return
