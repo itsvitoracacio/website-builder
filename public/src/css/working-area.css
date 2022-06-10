@@ -85,13 +85,13 @@
 	flex-grow: 1;
 }
 
-.rules-area,
+.code-editor-container,
 .rendering-area {
 	width: 50%;
 }
 
-.rules-area {
-	border: 1px solid var(--edit-main-selector-hover-border-color);
+.code-editor-container {
+	border: 1px solid #c0c0c0;
 }
 
 .rendering-area {
