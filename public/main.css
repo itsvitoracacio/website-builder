@@ -1,0 +1,8 @@
+/* This needs to be packaged into one file, instead of being multiple requests. After that, we can put it back into the src folder */
+
+@import url(./src/css/normalize.css);
+@import url(./src/css/style.css);
+@import url(./src/css/context-menus.css);
+@import url(./src/css/app-header.css);
+@import url(./src/css/edit-sidebar.css);
+@import url(./src/css/working-area.css);

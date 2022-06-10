@@ -2,53 +2,12 @@ const express = require('express')
 const app = express()
 const PORT = 8000
 
-app.use(express.json())
+app.use(express.static('public'))
 app.use(express.urlencoded({ extended: true }))
+app.use(express.json())
 
-// Class that all served files belong to
-class File {
-	constructor(fileAddress) {
-		this.fileAddress = fileAddress
-	}
-	serveFile() {
-		app.get(this.fileAddress, (_, res) =>
-			res.sendFile(__dirname + this.fileAddress)
-		)
-	}
-}
-
-// Creating and serving page files and auxiliary files
+// Setting page routes
 app.get('/', (_, res) => res.sendFile(__dirname + '/index.html'))
-const cssNormalize = new File('/css/normalize.css')
-const cssStyle = new File('/css/style.css')
-const cssContextMenus = new File('/css/context-menus.css')
-const cssAppHeader = new File('/css/app-header.css')
-const cssEditSidebar = new File('/css/edit-sidebar.css')
-const cssWorkingArea = new File('/css/working-area.css')
-const jsMain = new File('/js/main.js')
-const jsSidebar = new File('/js/sidebar.js')
-cssNormalize.serveFile()
-cssStyle.serveFile()
-cssContextMenus.serveFile()
-cssAppHeader.serveFile()
-cssEditSidebar.serveFile()
-cssWorkingArea.serveFile()
-jsMain.serveFile()
-jsSidebar.serveFile()
-
-// Creating and serving image files
-const homeIcon = new File('/assets/home-icon.svg')
-const profilePic = new File('/assets/profile-picture.svg')
-const clientPic = new File('/assets/client-picture.svg')
-const chevronIcon = new File('/assets/right-chevron.svg')
-const thrashIcon = new File('/assets/thrash-icon.svg')
-const closeIcon = new File('/assets/close-icon.svg')
-homeIcon.serveFile()
-profilePic.serveFile()
-clientPic.serveFile()
-chevronIcon.serveFile()
-thrashIcon.serveFile()
-closeIcon.serveFile()
 
 // API endpoints
 const EDIT_PIECETYPE_ENDPOINT = '/api/pieces/elements/:type'
@@ -109,6 +68,7 @@ function processRequest(req, res, method) {
 }
 
 app.get(EDIT_PIECETYPE_ENDPOINT, (req, res) => res.json(db[req.params.type]))
+
 app.get(EDIT_PARENTSELECTOR_ENDPOINT, (req, res) => {
 	const param = req.params
 	res.json(db[param.type][param.parentSelector])
@@ -117,6 +77,7 @@ app.get(EDIT_PARENTSELECTOR_ENDPOINT, (req, res) => {
 app.post(EDIT_PARENTSELECTOR_ENDPOINT, (req, res) =>
 	processRequest(req, res, 'POST')
 )
+
 // app.put(ELEMENTS_ENDPOINT, (req, res) => processRequest(req, res, 'PUT'))
 
 app.delete(EDIT_PARENTSELECTOR_ENDPOINT, (req, res) =>
