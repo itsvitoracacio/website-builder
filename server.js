@@ -58,7 +58,7 @@ const db = {
 function processRequest(req, res, method) {
 	const type = req.params.type
 	const parentSelector = req.params.parentSelector
-	const { variantName, cssProps } = req.body
+	const { variantName, cssRules } = req.body
 
 	const piecesOfSelectorInDb = db[type][parentSelector]
 	const variantDoesExist = variantName in piecesOfSelectorInDb
@@ -67,9 +67,9 @@ function processRequest(req, res, method) {
 	const methodIsPost = method === 'POST'
 	if (methodIsPost && !variantDoesExist) piecesOfSelectorInDb[variantName] = {}
 
-	// // Updating the element's cssProps
-	// const methodIsPut = method === 'PUT'
-	// if (methodIsPut && elemExists) elementsWithTag[name].cssProps = cssProps
+	// // Updating the element's cssRules
+	const methodIsPut = method === 'PUT'
+	if (methodIsPut && variantDoesExist) piecesOfSelectorInDb[variantName] = cssRules
 
 	// Deleting the element
 	const methodIsDelete = method === 'DELETE'
@@ -90,7 +90,9 @@ app.post(EDIT_PARENTSELECTOR_ENDPOINT, (req, res) =>
 	processRequest(req, res, 'POST')
 )
 
-// app.put(ELEMENTS_ENDPOINT, (req, res) => processRequest(req, res, 'PUT'))
+app.put(EDIT_PARENTSELECTOR_ENDPOINT, (req, res) =>
+	processRequest(req, res, 'PUT')
+)
 
 app.delete(EDIT_PARENTSELECTOR_ENDPOINT, (req, res) =>
 	processRequest(req, res, 'DELETE')

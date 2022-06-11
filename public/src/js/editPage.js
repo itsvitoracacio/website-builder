@@ -231,6 +231,21 @@ class EditVariantSelector extends EditSelector {
 		this.variantName = variantName
 	}
 
+	cleanChildrenArea() {
+		// Read what's written on the editor
+		const currentValue = codeEditor.state.doc.toString()
+		const endPosition = currentValue.length
+
+		// Change what's written on the editor
+		codeEditor.dispatch({
+			changes: {
+				from: 0,
+				to: endPosition,
+				insert: '',
+			},
+		})
+	}
+
 	setUpSelectorBtn() {
 		this.btn.classList.add('variation-btn')
 		this.btn.id = `${this.variantName}VariantSelector`
@@ -262,9 +277,11 @@ class EditVariantSelector extends EditSelector {
 			}
 		}
 
-		const cssRuleBlock = cssRules
-			.map(rule => `${Object.keys(rule)}: ${rule[Object.keys(rule)]};`)
-			.join('\n\t')
+		const cssRuleBlock = cssRules.length
+			? cssRules
+					.map(rule => `${Object.keys(rule)}: ${rule[Object.keys(rule)]};`)
+					.join('\n\t')
+			: ''
 		const cssDeclaration = `${variantName} {\n\t${cssRuleBlock}\n}\n`
 
 		// Read what's written on the editor
@@ -274,32 +291,41 @@ class EditVariantSelector extends EditSelector {
 		// Change what's written on the editor
 		codeEditor.dispatch({
 			changes: {
-				from: endPosition ? endPosition + '\n' : 0,
+				from: 0,
+				to: endPosition,
 				insert: cssDeclaration,
 			},
 		})
 	}
 
 	showUserWhereTheyAre() {
+		// Removing the 'current-place' class from other selector btns
+		const selectorsBtns = Array.from(this.btn.parentElement.children)
+		selectorsBtns.forEach(btn => btn.classList.remove('current-place'))
+
+		// Removing the other labels label from the DOM
+		const variantLabelsArea = document.querySelector('#variantLabelsArea')
+		const visibleLabels = Array.from(variantLabelsArea.children)
+		if (visibleLabels) visibleLabels.forEach(label => label.remove())
+
+		// Adding the 'current-place' class to this selector button
 		this.btn.classList.add('current-place')
 
+		// Creating and setting up the label for this selector button
 		const variantLabel = document.createElement('span')
 		variantLabel.classList.add('variation-label')
 		variantLabel.innerText = this.btn.innerText
 
+		// Adding the event listener to remove the lable and the css rule block from the code editor
 		variantLabel.addEventListener('click', e => {
-			e.target.remove()
+			e.target.remove() /* Removes the label from the label area */
+			this.cleanChildrenArea() /* Removes the css rule block from the content editor */
 
-			this.btn.classList.remove('current-place')
+			this.btn.classList.remove('current-place') /* Removes class from btn */
 		})
 
-		const variantLabelsArea = document.querySelector('#variantLabelsArea')
+		// Adding the label to the DOM
 		variantLabelsArea.appendChild(variantLabel)
-	}
-
-	// These methods will be erased afterwards
-	cleanChildrenArea() {
-		return
 	}
 }
 

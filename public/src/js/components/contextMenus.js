@@ -1,3 +1,5 @@
+import { codeEditor } from './codeEditor'
+
 class ContextMenu {
 	constructor(pieceType, endpoint, parentName, selectorName) {
 		this.pieceType = pieceType
@@ -202,7 +204,18 @@ export class VariantContextMenu extends CustomSelectorContextMenu {
 	}
 
 	removeSelectorContent() {
-		console.log('Please set up removeSelectorContent()')
+		// Read what's written on the editor
+		const currentValue = codeEditor.state.doc.toString()
+		const endPosition = currentValue.length
+
+		// Change what's written on the editor
+		codeEditor.dispatch({
+			changes: {
+				from: 0,
+				to: endPosition,
+				insert: '',
+			},
+		})
 	}
 
 	// Methods needed for this.stopShowingSelectorAnywhereElse()

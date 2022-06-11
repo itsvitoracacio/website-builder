@@ -56,7 +56,15 @@ __webpack_require__.r(__webpack_exports__);
 
 const codeEditor = new codemirror__WEBPACK_IMPORTED_MODULE_0__.EditorView({
 	state: _codemirror_state__WEBPACK_IMPORTED_MODULE_1__.EditorState.create({
-		extensions: [codemirror__WEBPACK_IMPORTED_MODULE_2__.basicSetup, (0,_codemirror_lang_css__WEBPACK_IMPORTED_MODULE_3__.css)()],
+		extensions: [
+			codemirror__WEBPACK_IMPORTED_MODULE_2__.basicSetup,
+			(0,_codemirror_lang_css__WEBPACK_IMPORTED_MODULE_3__.css)(),
+			codemirror__WEBPACK_IMPORTED_MODULE_0__.EditorView.updateListener.of(v => {
+				if (v.docChanged) {
+					console.log('DO SOMETHING WITH THE NEW CODE')
+				}
+			}),
+		],
 		doc: '',
 	}),
 	parent: document.querySelector('#codeEditorArea'),
@@ -77,6 +85,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "VariantContextMenu": () => (/* binding */ VariantContextMenu)
 /* harmony export */ });
+/* harmony import */ var _codeEditor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./codeEditor */ "./public/src/js/components/codeEditor.js");
+
+
 class ContextMenu {
 	constructor(pieceType, endpoint, parentName, selectorName) {
 		this.pieceType = pieceType
@@ -281,7 +292,18 @@ class VariantContextMenu extends CustomSelectorContextMenu {
 	}
 
 	removeSelectorContent() {
-		console.log('Please set up removeSelectorContent()')
+		// Read what's written on the editor
+		const currentValue = _codeEditor__WEBPACK_IMPORTED_MODULE_0__.codeEditor.state.doc.toString()
+		const endPosition = currentValue.length
+
+		// Change what's written on the editor
+		_codeEditor__WEBPACK_IMPORTED_MODULE_0__.codeEditor.dispatch({
+			changes: {
+				from: 0,
+				to: endPosition,
+				insert: '',
+			},
+		})
 	}
 
 	// Methods needed for this.stopShowingSelectorAnywhereElse()
@@ -312,6 +334,7 @@ class VariantContextMenu extends CustomSelectorContextMenu {
 		labelToDelete.remove()
 	}
 }
+
 
 /***/ }),
 
@@ -560,6 +583,21 @@ class EditVariantSelector extends EditSelector {
 		this.variantName = variantName
 	}
 
+	cleanChildrenArea() {
+		// Read what's written on the editor
+		const currentValue = _components_codeEditor__WEBPACK_IMPORTED_MODULE_1__.codeEditor.state.doc.toString()
+		const endPosition = currentValue.length
+
+		// Change what's written on the editor
+		_components_codeEditor__WEBPACK_IMPORTED_MODULE_1__.codeEditor.dispatch({
+			changes: {
+				from: 0,
+				to: endPosition,
+				insert: '',
+			},
+		})
+	}
+
 	setUpSelectorBtn() {
 		this.btn.classList.add('variation-btn')
 		this.btn.id = `${this.variantName}VariantSelector`
@@ -591,9 +629,11 @@ class EditVariantSelector extends EditSelector {
 			}
 		}
 
-		const cssRuleBlock = cssRules
-			.map(rule => `${Object.keys(rule)}: ${rule[Object.keys(rule)]};`)
-			.join('\n\t')
+		const cssRuleBlock = cssRules.length
+			? cssRules
+					.map(rule => `${Object.keys(rule)}: ${rule[Object.keys(rule)]};`)
+					.join('\n\t')
+			: ''
 		const cssDeclaration = `${variantName} {\n\t${cssRuleBlock}\n}\n`
 
 		// Read what's written on the editor
@@ -603,32 +643,41 @@ class EditVariantSelector extends EditSelector {
 		// Change what's written on the editor
 		_components_codeEditor__WEBPACK_IMPORTED_MODULE_1__.codeEditor.dispatch({
 			changes: {
-				from: endPosition ? endPosition + '\n' : 0,
+				from: 0,
+				to: endPosition,
 				insert: cssDeclaration,
 			},
 		})
 	}
 
 	showUserWhereTheyAre() {
+		// Removing the 'current-place' class from other selector btns
+		const selectorsBtns = Array.from(this.btn.parentElement.children)
+		selectorsBtns.forEach(btn => btn.classList.remove('current-place'))
+
+		// Removing the other labels label from the DOM
+		const variantLabelsArea = document.querySelector('#variantLabelsArea')
+		const visibleLabels = Array.from(variantLabelsArea.children)
+		if (visibleLabels) visibleLabels.forEach(label => label.remove())
+
+		// Adding the 'current-place' class to this selector button
 		this.btn.classList.add('current-place')
 
+		// Creating and setting up the label for this selector button
 		const variantLabel = document.createElement('span')
 		variantLabel.classList.add('variation-label')
 		variantLabel.innerText = this.btn.innerText
 
+		// Adding the event listener to remove the lable and the css rule block from the code editor
 		variantLabel.addEventListener('click', e => {
-			e.target.remove()
+			e.target.remove() /* Removes the label from the label area */
+			this.cleanChildrenArea() /* Removes the css rule block from the content editor */
 
-			this.btn.classList.remove('current-place')
+			this.btn.classList.remove('current-place') /* Removes class from btn */
 		})
 
-		const variantLabelsArea = document.querySelector('#variantLabelsArea')
+		// Adding the label to the DOM
 		variantLabelsArea.appendChild(variantLabel)
-	}
-
-	// These methods will be erased afterwards
-	cleanChildrenArea() {
-		return
 	}
 }
 
