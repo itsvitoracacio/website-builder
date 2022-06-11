@@ -1,5 +1,6 @@
 import { Accordion } from './src/js/components/accordion'
 import { EditPieceType } from './src/js/editPage'
+import { codeEditor } from './src/js/components/codeEditor'
 
 // Edit > Sidebar toggles
 const branding = new Accordion('editSidebar', 'Branding', 'List')
