@@ -57,8 +57,9 @@ __webpack_require__.r(__webpack_exports__);
 const codeEditor = new codemirror__WEBPACK_IMPORTED_MODULE_0__.EditorView({
 	state: _codemirror_state__WEBPACK_IMPORTED_MODULE_1__.EditorState.create({
 		extensions: [codemirror__WEBPACK_IMPORTED_MODULE_2__.basicSetup, (0,_codemirror_lang_css__WEBPACK_IMPORTED_MODULE_3__.css)()],
+		doc: '',
 	}),
-	parent: document.querySelector('#cssRulesArea'),
+	parent: document.querySelector('#codeEditorArea'),
 	// viewport: { from: 1, to: 24 },
 	// visibleRanges: { from: 1, to: 24 },
 })
@@ -325,6 +326,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "EditPieceType": () => (/* binding */ EditPieceType)
 /* harmony export */ });
 /* harmony import */ var _components_contextMenus__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./components/contextMenus */ "./public/src/js/components/contextMenus.js");
+/* harmony import */ var _components_codeEditor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./components/codeEditor */ "./public/src/js/components/codeEditor.js");
+
 
 
 class EditPieceType {
@@ -578,9 +581,32 @@ class EditVariantSelector extends EditSelector {
 	}
 
 	async showContent() {
-		console.log(
-			'Please set up the showContent() method for the variant selectors'
-		)
+		const allVariants = await this.sendGetRequest()
+		let variantName, cssRules
+
+		for (let variant in allVariants) {
+			if (variant === this.variantName) {
+				variantName = variant
+				cssRules = allVariants[variant]
+			}
+		}
+
+		const cssRuleBlock = cssRules
+			.map(rule => `${Object.keys(rule)}: ${rule[Object.keys(rule)]};`)
+			.join('\n\t')
+		const cssDeclaration = `${variantName} {\n\t${cssRuleBlock}\n}\n`
+
+		// Read what's written on the editor
+		const currentValue = _components_codeEditor__WEBPACK_IMPORTED_MODULE_1__.codeEditor.state.doc.toString()
+		const endPosition = currentValue.length
+
+		// Change what's written on the editor
+		_components_codeEditor__WEBPACK_IMPORTED_MODULE_1__.codeEditor.dispatch({
+			changes: {
+				from: endPosition ? endPosition + '\n' : 0,
+				insert: cssDeclaration,
+			},
+		})
 	}
 
 	showUserWhereTheyAre() {
@@ -598,6 +624,11 @@ class EditVariantSelector extends EditSelector {
 
 		const variantLabelsArea = document.querySelector('#variantLabelsArea')
 		variantLabelsArea.appendChild(variantLabel)
+	}
+
+	// These methods will be erased afterwards
+	cleanChildrenArea() {
+		return
 	}
 }
 
@@ -26450,8 +26481,6 @@ var __webpack_exports__ = {};
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _src_js_components_accordion__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./src/js/components/accordion */ "./public/src/js/components/accordion.js");
 /* harmony import */ var _src_js_editPage__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./src/js/editPage */ "./public/src/js/editPage.js");
-/* harmony import */ var _src_js_components_codeEditor__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./src/js/components/codeEditor */ "./public/src/js/components/codeEditor.js");
-
 
 
 
@@ -26466,6 +26495,9 @@ components.accordToggle.addEventListener('click', components.openOrClose)
 // Edit > Sidebar toggles > Elements
 const typographyType = new _src_js_editPage__WEBPACK_IMPORTED_MODULE_1__.EditPieceType('Typography')
 typographyType.addEventListenerToRenderContent()
+
+// Edit > Working area > Code editor
+
 
 // Edit > Working area toggles
 const inheritance = new _src_js_components_accordion__WEBPACK_IMPORTED_MODULE_0__.Accordion('editWorkingArea', 'Inherited', 'Rules')

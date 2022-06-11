@@ -1,4 +1,5 @@
 import { VariantContextMenu } from './components/contextMenus'
+import { codeEditor } from './components/codeEditor'
 
 export class EditPieceType {
 	//
@@ -251,9 +252,32 @@ class EditVariantSelector extends EditSelector {
 	}
 
 	async showContent() {
-		console.log(
-			'Please set up the showContent() method for the variant selectors'
-		)
+		const allVariants = await this.sendGetRequest()
+		let variantName, cssRules
+
+		for (let variant in allVariants) {
+			if (variant === this.variantName) {
+				variantName = variant
+				cssRules = allVariants[variant]
+			}
+		}
+
+		const cssRuleBlock = cssRules
+			.map(rule => `${Object.keys(rule)}: ${rule[Object.keys(rule)]};`)
+			.join('\n\t')
+		const cssDeclaration = `${variantName} {\n\t${cssRuleBlock}\n}\n`
+
+		// Read what's written on the editor
+		const currentValue = codeEditor.state.doc.toString()
+		const endPosition = currentValue.length
+
+		// Change what's written on the editor
+		codeEditor.dispatch({
+			changes: {
+				from: endPosition ? endPosition + '\n' : 0,
+				insert: cssDeclaration,
+			},
+		})
 	}
 
 	showUserWhereTheyAre() {
@@ -271,6 +295,11 @@ class EditVariantSelector extends EditSelector {
 
 		const variantLabelsArea = document.querySelector('#variantLabelsArea')
 		variantLabelsArea.appendChild(variantLabel)
+	}
+
+	// These methods will be erased afterwards
+	cleanChildrenArea() {
+		return
 	}
 }
 

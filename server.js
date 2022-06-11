@@ -18,9 +18,21 @@ const EDIT_PARENTSELECTOR_ENDPOINT =
 const db = {
 	typography: {
 		h1: {
-			h1: {},
-			'bright-bg': {},
-			'dark-bg': {},
+			h1: [
+				{ 'font-size': '1rem' },
+				{ 'line-height': '1.35rem' },
+				{ 'text-align': 'center' },
+			],
+			'bright-bg': [
+				{ color: 'black' },
+				{ 'background-color': 'white' },
+				{ display: 'block' },
+			],
+			'dark-bg': [
+				{ color: 'black' },
+				{ 'background-color': 'white' },
+				{ display: 'inline-block' },
+			],
 		},
 		h2: {},
 		h3: {},
