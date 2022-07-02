@@ -1,5 +1,5 @@
-import { Accordion } from './src/js/components/accordion'
-import { EditPieceType } from './src/js/editPage'
+import { Accordion } from './src/components/basicUi/accordion'
+import { PieceType } from './src/js/editPage'
 
 // Edit > Sidebar toggles
 const branding = new Accordion('editSidebar', 'Branding', 'List')
@@ -10,11 +10,10 @@ elements.accordToggle.addEventListener('click', elements.openOrClose)
 components.accordToggle.addEventListener('click', components.openOrClose)
 
 // Edit > Sidebar toggles > Elements
-const typographyType = new EditPieceType('Typography')
-typographyType.addEventListenerToRenderContent()
+const typographyType = new PieceType({ pieceType: 'Typography' })
+typographyType.addEventListenerToRenderChildren()
 
 // Edit > Working area > Code editor
-
 
 // Edit > Working area toggles
 const inheritance = new Accordion('editWorkingArea', 'Inherited', 'Rules')

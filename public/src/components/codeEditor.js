@@ -10,7 +10,7 @@ export const codeEditor = new EditorView({
 			EditorView.updateListener.of(v => {
 				if (v.docChanged) {
 					console.log('DO SOMETHING WITH THE NEW CODE')
-					checkForValidCode()
+					// checkForValidCode()
 				}
 			}),
 		],

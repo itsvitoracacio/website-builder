@@ -2,10 +2,67 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./public/src/js/components/accordion.js":
-/*!***********************************************!*\
-  !*** ./public/src/js/components/accordion.js ***!
-  \***********************************************/
+/***/ "./public/src/components/api/httpReq.js":
+/*!**********************************************!*\
+  !*** ./public/src/components/api/httpReq.js ***!
+  \**********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "HttpReqs": () => (/* binding */ HttpReqs)
+/* harmony export */ });
+class HttpReqs {
+	constructor() {
+		this.endpoint = ''
+	}
+
+	async sendGetRequest() {
+		return await this.sendHttpRequest('GET')
+	}
+
+	async sendPostRequest(whatToPost) {
+		return await this.sendHttpRequest('POST', whatToPost)
+	}
+
+	async sendPutRequest(whatToUpdate, newContent) {
+		return await this.sendHttpRequest('PUT', { whatToUpdate, newContent })
+	}
+
+	async sendDeleteRequest(whatToDelete) {
+		return await this.sendHttpRequest('DELETE', whatToDelete)
+	}
+
+	async sendHttpRequest(httpMethod, reqBody) {
+		try {
+			const res = await fetch(
+				this.endpoint,
+				httpMethod === 'GET'
+					? {
+							method: 'GET',
+							headers: { 'Content-Type': 'application/json' },
+					  }
+					: {
+							method: httpMethod,
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify(reqBody),
+					  }
+			)
+			const data = await res.json()
+			return data
+		} catch (err) {
+			console.log(err)
+		}
+	}
+}
+
+
+/***/ }),
+
+/***/ "./public/src/components/basicUi/accordion.js":
+/*!****************************************************!*\
+  !*** ./public/src/components/basicUi/accordion.js ***!
+  \****************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -36,10 +93,90 @@ class Accordion {
 
 /***/ }),
 
-/***/ "./public/src/js/components/codeEditor.js":
-/*!************************************************!*\
-  !*** ./public/src/js/components/codeEditor.js ***!
-  \************************************************/
+/***/ "./public/src/components/basicUi/contextMenu/contextMenu.js":
+/*!******************************************************************!*\
+  !*** ./public/src/components/basicUi/contextMenu/contextMenu.js ***!
+  \******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ContextMenu": () => (/* binding */ ContextMenu)
+/* harmony export */ });
+class ContextMenu {
+	constructor({ pieceType, endpoint }) {
+		this.pieceType = pieceType
+		this.endpoint = endpoint
+		this.clickEvent = ''
+		this.contextMenu = document.createElement('div')
+	}
+
+	set setClickEvent(clickEvent) {
+		this.clickEvent = clickEvent
+	}
+
+	// this method is only defined on the children classes
+	createContextMenu() {
+		console.log('Please define createContextMenu() on the child class')
+	}
+
+	// holds everything that needs to get done prior to showing the context menu when a user right-clicks
+	openContextMenu(event) {
+		// preventing the browser from opening its default context menu
+		event.preventDefault()
+
+		// if there's no context menu attached to the click target, do nothing
+		const contextClicked = event.target.dataset.context
+		if (!contextClicked) return
+
+		// setting the this.clickEvent property now that a click event happened
+		this.setClickEvent = event
+
+		// closing other context menu that might be open and then showing the correct one for what the user clicked
+		this.closeContextMenu()
+		this.showContextMenu()
+	}
+
+	// this method is only defined on the children classes
+	setUpContextMenuBtns() {
+		console.log('Please set up setUpContextMenuBtns() on the child class')
+	}
+
+	// triggers the closing of any context menu when the user clicks anywhere while one is open
+	detectClickWhileContextMenuIsOpen() {
+		const boundCloseContextMenu = this.closeContextMenu.bind(this)
+		document.addEventListener('click', boundCloseContextMenu)
+	}
+
+	// closes any context menu that might be open on the page
+	closeContextMenu() {
+		// selecting all context menus on the page, regardless of element
+		const contextMenus = Array.from(document.querySelectorAll('.context-menu'))
+
+		// determining which one is active, and closing it
+		const activeCM = contextMenus.find(cm => cm.classList.contains('active'))
+		if (activeCM) {
+			activeCM.classList.remove('active')
+			activeCM.style.top = ''
+			activeCM.style.left = ''
+		}
+	}
+
+	// shows the context menu of the element that the user clicked and positions it correctly
+	showContextMenu() {
+		this.contextMenu.classList.add('active')
+		this.contextMenu.style.top = this.clickEvent.pageY + 'px'
+		this.contextMenu.style.left = this.clickEvent.pageX + 'px'
+	}
+}
+
+
+/***/ }),
+
+/***/ "./public/src/components/codeEditor.js":
+/*!*********************************************!*\
+  !*** ./public/src/components/codeEditor.js ***!
+  \*********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -62,6 +199,7 @@ const codeEditor = new codemirror__WEBPACK_IMPORTED_MODULE_0__.EditorView({
 			codemirror__WEBPACK_IMPORTED_MODULE_0__.EditorView.updateListener.of(v => {
 				if (v.docChanged) {
 					console.log('DO SOMETHING WITH THE NEW CODE')
+					// checkForValidCode()
 				}
 			}),
 		],
@@ -75,169 +213,168 @@ const codeEditor = new codemirror__WEBPACK_IMPORTED_MODULE_0__.EditorView({
 
 /***/ }),
 
-/***/ "./public/src/js/components/contextMenus.js":
-/*!**************************************************!*\
-  !*** ./public/src/js/components/contextMenus.js ***!
-  \**************************************************/
+/***/ "./public/src/components/design/design_api.js":
+/*!****************************************************!*\
+  !*** ./public/src/components/design/design_api.js ***!
+  \****************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "VariantContextMenu": () => (/* binding */ VariantContextMenu)
+/* harmony export */   "PieceCrud": () => (/* binding */ PieceCrud),
+/* harmony export */   "PieceTypeCrud": () => (/* binding */ PieceTypeCrud),
+/* harmony export */   "VariantCrud": () => (/* binding */ VariantCrud)
 /* harmony export */ });
-/* harmony import */ var _codeEditor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./codeEditor */ "./public/src/js/components/codeEditor.js");
+/* harmony import */ var _api_httpReq__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api/httpReq */ "./public/src/components/api/httpReq.js");
 
 
-class ContextMenu {
-	constructor(pieceType, endpoint, parentName, selectorName) {
-		this.pieceType = pieceType
-		this.endpoint = endpoint
-		this.parentName = parentName
-		this.selectorName = selectorName
-		this.clickEvent = ''
-		this.contextMenu = document.createElement('div')
+class PieceTypeCrud extends _api_httpReq__WEBPACK_IMPORTED_MODULE_0__.HttpReqs {
+	constructor(pieceType) {
+		super()
+		this.endpoint = `/api/pieces/elements/${pieceType.toLowerCase()}`
 	}
 
-	set setClickEvent(clickEvent) {
-		this.clickEvent = clickEvent
-	}
-
-	createContextMenu() {
-		console.log('Please define setUpContextMenu() on the child class')
-	}
-
-	openContextMenu(event) {
-		// Preventing the browser from opening the default window context menu
-		event.preventDefault()
-
-		// If there's no context menu attached to the click target, do nothing
-		const contextClicked = event.target.dataset.context
-		if (!contextClicked) return
-
-		// Setting the this.clickEvent property now that a click event happened
-		this.setClickEvent = event
-
-		// Showing the context menu to the user
-		this.showContextMenu()
-	}
-
-	setUpContextMenuBtns() {
-		console.log('Please set up setUpContextMenuBtns() on the child class')
-	}
-
-	detectClickWhileContextMenuIsOpen() {
-		const boundCloseContextMenu = this.closeContextMenu.bind(this)
-		document.addEventListener('click', boundCloseContextMenu)
-	}
-
-	closeContextMenu() {
-		// Selecting all context menus on the page
-		const contextMenus = Array.from(document.querySelectorAll('.context-menu'))
-
-		// Determining which one is active, and closing it
-		const activeCM = contextMenus.find(cm => cm.classList.contains('active'))
-		if (activeCM) {
-			activeCM.classList.remove('active')
-			activeCM.style.top = ''
-			activeCM.style.left = ''
-		}
-	}
-
-	showContextMenu() {
-		this.closeContextMenu()
-
-		this.contextMenu.classList.add('active')
-		this.contextMenu.style.top = this.clickEvent.pageY + 'px'
-		this.contextMenu.style.left = this.clickEvent.pageX + 'px'
+	async readPiecesOfType() {
+		return await this.sendGetRequest(this.endpoint)
 	}
 }
 
-class CustomSelectorContextMenu extends ContextMenu {
-	constructor(pieceType, endpoint, parentName, selectorName) {
-		super(pieceType, endpoint, parentName, selectorName)
+class PieceCrud extends _api_httpReq__WEBPACK_IMPORTED_MODULE_0__.HttpReqs {
+	constructor({ pieceType, pieceName }) {
+		super()
+		this.endpoint = `/api/pieces/elements/${pieceType.toLowerCase()}/${pieceName}`
 	}
 
-	// Methods from the prototype that need to be modified
+	async readVariantsOfPiece() {
+		return await this.sendGetRequest()
+	}
+}
+
+class VariantCrud extends _api_httpReq__WEBPACK_IMPORTED_MODULE_0__.HttpReqs {
+	constructor({ pieceType, pieceName }) {
+		super()
+		this.endpoint = `/api/pieces/elements/${pieceType.toLowerCase()}/${pieceName}`
+	}
+
+	async createVariant(newVariantName) {
+		return await this.sendPostRequest({ newVariantName })
+	}
+
+	async readDeclarationBlockOfVariant(variantToRead) {
+		const res = await this.sendGetRequest()
+		return res[variantToRead]
+	}
+
+	async updateVariantName(currentVariantName, newVariantName) {
+		return await this.sendPutRequest(/* something here */)
+	}
+
+	async updateVariantDeclarationBlock(variantToUpdate, newDeclarationBlock) {
+		return await this.sendPutRequest({ variantToUpdate, newDeclarationBlock })
+	}
+
+	async deleteVariant(variantToDelete) {
+		return await this.sendDeleteRequest({ variantToDelete })
+	}
+}
+
+
+/***/ }),
+
+/***/ "./public/src/components/design/design_contextMenu.js":
+/*!************************************************************!*\
+  !*** ./public/src/components/design/design_contextMenu.js ***!
+  \************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "PieceContextMenu": () => (/* binding */ PieceContextMenu),
+/* harmony export */   "PieceTypeContextMenu": () => (/* binding */ PieceTypeContextMenu),
+/* harmony export */   "VariantContextMenu": () => (/* binding */ VariantContextMenu)
+/* harmony export */ });
+/* harmony import */ var _basicUi_contextMenu_contextMenu__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../basicUi/contextMenu/contextMenu */ "./public/src/components/basicUi/contextMenu/contextMenu.js");
+
+
+class CustomSelectorContextMenu extends _basicUi_contextMenu_contextMenu__WEBPACK_IMPORTED_MODULE_0__.ContextMenu {
+	constructor({ pieceType, endpoint, pieceName, selectorName, deleteMethod }) {
+		super({ pieceType, endpoint })
+		this.pieceName = pieceName
+		this.selectorName = selectorName
+		this.crudDelete = deleteMethod
+	}
+
+	// creates the context menu for a given element, with all its options and functionality
 	createContextMenu() {
+		// setting up this context menu
 		this.contextMenu.id = 'contextMenuCustomSelector'
 		this.contextMenu.classList.add('context-menu')
 		this.contextMenu.dataset.customSelector = this.selectorName
 
+		// creating the list of buttons that will be on this context menu
 		const menuList = document.createElement('ul')
-
-		const deleteOption = document.createElement('li')
-		deleteOption.id = 'delete-selector'
-		deleteOption.classList.add('delete')
-		deleteOption.innerText = 'Delete'
-
-		const contextMenusArea = document.querySelector('.context-menus')
-
-		menuList.appendChild(deleteOption)
+		this.setUpContextMenuBtns(menuList)
 		this.contextMenu.appendChild(menuList)
+
+		// adding this context menu to the dom
+		const contextMenusArea = document.querySelector('.context-menus')
 		contextMenusArea.appendChild(this.contextMenu)
 	}
 
-	setUpContextMenuBtns() {
-		// Delete button
-		this.includeDeleteSelectorBtn()
+	// creates each of the buttons that this element needs in its context menu
+	setUpContextMenuBtns(menuList) {
+		// creating the delete selector button
+		const deleteBtnOnContextMenu = document.createElement('li')
+		deleteBtnOnContextMenu.id = 'delete-selector'
+		deleteBtnOnContextMenu.classList.add('delete')
+		deleteBtnOnContextMenu.innerText = 'Delete'
+
+		this.addDeleteSelectorFunctionality(deleteBtnOnContextMenu)
+
+		// menuList.appendChild(deleteOptionOnContextMenu)
 	}
 
-	// Methods of its own
-	includeDeleteSelectorBtn() {
-		console.log('Please set up includeDeleteSelectorBtn() on the child class')
-
-		// This needs to be declared on the child classes because of the .bind() method, but on both child classes it will have the exact following code:
-
-		// // const boundCheckBeforeDeleting = this.checkBeforeDeleting.bind(this)
-		// // const deleteSelectorBtn = this.contextMenu.querySelector('#delete-selector')
-		// // deleteSelectorBtn.addEventListener('click', boundCheckBeforeDeleting)
+	// this method is only defined on the children classes because of .bind(), but on both child classes it will have the exact code
+	addDeleteSelectorFunctionality() {
+		console.log(
+			'Please set up addDeleteSelectorFunctionality() on the child class'
+		)
 	}
 
-	// Methods needed for includeDeleteSelectorBtn()
+	// this method is only defined on the children classes
 	checkBeforeDeleting() {
 		console.log('Please set up checkBeforeDeleting() on the child class')
 
-		this.deleteCustomSelector()
+		// this.deleteCustomSelector()
 	}
 
+	// holds all methods needed to delete the selector from the db and show the user that it was deleted
 	async deleteCustomSelector() {
-		const deleteResponse = await this.sendDeleteRequest()
-		const selectorToDelete = this.determineSelectorToDelete(deleteResponse)
+		const deleteResponse = await this.crudDelete()
+		const selectorToDelete =
+			this.determineSelectorToDeleteFromTheDom(deleteResponse)
 
-		this.removeSelectorContent()
+		// if it's a parent selector, it removes the variant from the dom
+		this.removeSelectorChildren()
 		this.stopShowingSelectorAnywhereElse()
-		selectorToDelete.remove() /* removing from the dom */
+		selectorToDelete.remove() /* removing the selector itself from the dom */
 	}
 
-	async sendDeleteRequest() {
-		try {
-			const res = await fetch(this.endpoint, {
-				method: 'DELETE',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					variantName: `${this.selectorName}`,
-				}),
-			})
-			const data = await res.json()
-			return data
-		} catch (err) {
-			console.log(err)
-		}
-	}
-
-	determineSelectorToDelete(remainingVariantsInDb) {
-		// Comparing the current dom selectors to the current db selectors. The one missing should be removed
+	// makes sure that we're only removing from the dom what was just removed from the database
+	determineSelectorToDeleteFromTheDom(remainingCustomSelectorsInDb) {
+		// comparing the current dom selectors to the current db selectors
 		const selectorArea = document.querySelector(`#${this.siblingsArea}Area`)
 		const query = '[data-context=CustomSelector]'
 
 		const domSelectors = Array.from(selectorArea.querySelectorAll(query))
 		const domSNames = domSelectors.map(domS => domS.dataset.selectorName)
 
-		// Determining which dom selector needs to be removed from the variants area
+		// determining the name of the selector deleted from the db
 		const nameOfSelectorDeletedFromDb = domSNames.find(
-			domSName => !(domSName in remainingVariantsInDb)
+			domSName => !(domSName in remainingCustomSelectorsInDb)
 		)
 
+		// storing that selector in a variable to return it
 		const selectorToDelete = domSelectors.find(
 			domS => domS.dataset.selectorName === nameOfSelectorDeletedFromDb
 		)
@@ -245,33 +382,47 @@ class CustomSelectorContextMenu extends ContextMenu {
 		return selectorToDelete
 	}
 
+	// this method is only defined on the children classes
 	stopShowingSelectorAnywhereElse() {
 		console.log(
 			'Please set up stopShowingSelectorAnywhereElse() on the child class'
 		)
 	}
 
-	removeSelectorContent() {
+	// this method is only define on the children classes
+	removeSelectorChildren() {
 		console.log('Please set up removeSelectorContent() on the child class')
 	}
 }
 
+// still need to create methods for this class
+class PieceTypeContextMenu extends CustomSelectorContextMenu {
+	constructor() {}
+}
+
+// still need to create methods for this class
+class PieceContextMenu extends CustomSelectorContextMenu {
+	constructor({ pieceType, endpoint, parentName, selectorName, deleteMethod }) {
+		super({ pieceType, endpoint, parentName, selectorName, deleteMethod })
+		this.siblingsArea = 'parents'
+	}
+}
+
 class VariantContextMenu extends CustomSelectorContextMenu {
-	constructor(pieceType, endpoint, parentName, selectorName) {
-		super(pieceType, endpoint, parentName, selectorName)
+	constructor({ pieceType, endpoint, pieceName, selectorName, deleteMethod }) {
+		super({ pieceType, endpoint, pieceName, selectorName, deleteMethod })
 		this.siblingsArea = 'variants'
 	}
 
-	// Methods from the prototype that need to be modified
-	includeDeleteSelectorBtn() {
+	// adds the behavior to the ui element delete button
+	addDeleteSelectorFunctionality(deleteBtnOnContextMenu) {
+		// this is only defined here because of the .bind() method, but it's the same across sibling classes
 		const boundCheckBeforeDeleting = this.checkBeforeDeleting.bind(this)
-		const deleteSelectorBtn = this.contextMenu.querySelector('#delete-selector')
-
-		deleteSelectorBtn.addEventListener('click', boundCheckBeforeDeleting)
+		deleteBtnOnContextMenu.addEventListener('click', boundCheckBeforeDeleting)
 	}
 
+	// checks whether the variant the user is trying to delete is the first variant created for that parent selector. Since it's the generic variant, that has the same name as the parent selector, it should only be deleted if it's the only one remaining
 	checkBeforeDeleting() {
-		// The first variant selector should only be deleted if it's the only one remaining
 		const isTheFirstVariantSelector = this.parentName === this.selectorName
 
 		const variantBtns = Array.from(document.querySelectorAll('.variantBtn'))
@@ -282,22 +433,24 @@ class VariantContextMenu extends CustomSelectorContextMenu {
 			return
 		}
 
-		this.deleteCustomSelector()
+		this.deleteCustomSelector() /* this method comes from the parent class */
 	}
 
+	// holds all methods to remove the selector from everywhere in the ui
 	stopShowingSelectorAnywhereElse() {
 		// Both of these methods have a checker inside them to see if they need to run
 		this.changeColorOfParentSelectorToNoVariants()
 		this.removeFromLabelsArea()
 	}
 
-	removeSelectorContent() {
+	// removes the css declaration block from the code editor
+	removeSelectorChildren() {
 		// Read what's written on the editor
-		const currentValue = _codeEditor__WEBPACK_IMPORTED_MODULE_0__.codeEditor.state.doc.toString()
+		const currentValue = codeEditor.state.doc.toString()
 		const endPosition = currentValue.length
 
 		// Change what's written on the editor
-		_codeEditor__WEBPACK_IMPORTED_MODULE_0__.codeEditor.dispatch({
+		codeEditor.dispatch({
 			changes: {
 				from: 0,
 				to: endPosition,
@@ -306,20 +459,24 @@ class VariantContextMenu extends CustomSelectorContextMenu {
 		})
 	}
 
-	// Methods needed for this.stopShowingSelectorAnywhereElse()
+	// shows to the user that a parent selector has no variants
 	changeColorOfParentSelectorToNoVariants() {
+		// checking if we really don't have any other variants
 		const variantsArea = document.querySelector('#variantsArea')
 		const variantBtns = Array.from(variantsArea.querySelectorAll('button'))
 
 		const noVariantsAnymore = variantBtns.length <= 1
 		if (!noVariantsAnymore) return
 
+		// changing the color of the parent selector
 		const query = `#${this.parentName}ParentSelector`
 		const parentSelector = document.querySelector(query)
 		parentSelector.classList.remove('hasSomeVariant')
 	}
 
+	// shows to the user that they can no longer edit that variant if they were in the middle of doing so
 	removeFromLabelsArea() {
+		// checking if the label that we should remove is actually showing
 		const selectorFullName = this.clickEvent.target.innerText
 
 		const variantLabelsArea = document.querySelector('#variantLabelsArea')
@@ -330,8 +487,165 @@ class VariantContextMenu extends CustomSelectorContextMenu {
 
 		if (!labelIsShowing) return
 
+		// removing the label from the labels area
 		const labelToDelete = vLabels.find(l => l.innerText === labelIsShowing)
 		labelToDelete.remove()
+	}
+}
+
+
+/***/ }),
+
+/***/ "./public/src/components/design/design_newSelectorBtn.js":
+/*!***************************************************************!*\
+  !*** ./public/src/components/design/design_newSelectorBtn.js ***!
+  \***************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "NewPieceBtn": () => (/* binding */ NewPieceBtn),
+/* harmony export */   "NewPieceTypeBtn": () => (/* binding */ NewPieceTypeBtn),
+/* harmony export */   "NewVariantBtn": () => (/* binding */ NewVariantBtn)
+/* harmony export */ });
+/* harmony import */ var _js_editPage__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../js/editPage */ "./public/src/js/editPage.js");
+
+
+class NewSelectorBtn {
+	constructor(pieceType, selectorsArea) {
+		this.pieceType = pieceType
+		this.endpoint = `/api/pieces/elements/${this.pieceType.toLowerCase()}`
+		this.newSelectorForm = document.createElement('form')
+		this.newSelectorBtn = document.createElement('input')
+		this.selectorsArea = selectorsArea
+	}
+
+	setUpForm(formId = 'newPieceTypeForm') {
+		this.newSelectorForm.autocomplete = 'off'
+		this.newSelectorForm.id = formId
+		this.addSubmitEventListenerToCreateNewSelector()
+	}
+
+	setUpBtn(btnId, btnClass) {
+		this.newSelectorBtn.type = 'button'
+		this.newSelectorBtn.value = '+'
+		this.newSelectorBtn.id = btnId
+		this.newSelectorBtn.classList.add(btnClass)
+		this.newSelectorBtn.autocomplete = 'off'
+	}
+
+	setUpChangeBtnOnFocus() {}
+
+	changeBtnToInput(inputType) {
+		this.newSelectorBtn.type = inputType
+		this.newSelectorBtn.value = ''
+		this.newSelectorForm.focus()
+		this.newSelectorBtn.focus()
+		this.newSelectorBtn.select()
+	}
+
+	addSubmitEventListenerToCreateNewSelector() {
+		this.newSelectorForm.addEventListener('submit', e => {
+			e.preventDefault()
+
+			const dbVariants = this.createSelector(this.newSelectorBtn.value)
+			this.receivePostResponse(dbVariants)
+		})
+	}
+
+	createSelector() {}
+
+	receivePostResponse() {}
+
+	appendBtnToForm() {
+		this.newSelectorForm.appendChild(this.newSelectorBtn)
+	}
+}
+
+class NewPieceTypeBtn extends NewSelectorBtn {
+	constructor() {}
+}
+
+class NewPieceBtn extends NewSelectorBtn {
+	constructor() {}
+}
+
+class NewVariantBtn extends NewSelectorBtn {
+	constructor({ pieceType, selectorsArea, pieceName, createMethod }) {
+		super(pieceType, selectorsArea)
+		this.pieceName = pieceName
+		this.endpoint = `/api/pieces/elements/${this.pieceType.toLowerCase()}/${this.pieceName}`
+		this.crudCreate = createMethod
+	}
+
+	setUpForm() {
+		super.setUpForm('newVariantForm')
+	}
+
+	setUpBtn() {
+		super.setUpBtn('newVariantBtn', 'add-variation-btn')
+	}
+
+	setUpChangeBtnOnFocus() {
+		//
+		// Turning btn into input text on click
+		this.newSelectorBtn.addEventListener('focusin', () => {
+			//
+			// The 1st variant it is automatically created w/ the default parameter: this.parentSelector
+			// If it's not the 1st, the user can choose the variant's name
+
+			const isTheFirstVariant = !document
+				.querySelector(`#${this.pieceName}ParentSelector`)
+				.classList.contains('hasSomeVariant')
+
+			if (isTheFirstVariant) this.createSelector()
+			else this.changeBtnToInput()
+		})
+
+		// Turning input text back into btn on focusout
+		this.newSelectorBtn.addEventListener('focusout', () => {
+			this.newSelectorBtn.type = 'button'
+			this.newSelectorBtn.value = '+'
+		})
+	}
+
+	async createSelector(inputValue = this.pieceName) {
+		return await this.createMethod({
+			pieceType: this.pieceType,
+			pieceName: this.pieceName,
+			variantName: inputValue,
+		})
+	}
+
+	receivePostResponse(dbVariants) {
+		const domVariants = Array.from(document.querySelectorAll('.variantBtn'))
+		const domVariantsNames = domVariants.map(dv => dv.dataset.selectorName)
+
+		const dbVariantsNames = Object.keys(dbVariants)
+		const newName = dbVariantsNames.find(dbv => !domVariantsNames.includes(dbv))
+
+		const newVariant = new _js_editPage__WEBPACK_IMPORTED_MODULE_0__.PieceVariant({
+			pieceType: this.pieceType,
+			childrenLevel: 'cssRules',
+			pieceName: this.pieceName,
+			variantName: newName,
+		})
+
+		newVariant.renderSelector(this.variantsArea)
+
+		this.showThatThisParentSelectorNowHasVariants()
+		this.newSelectorBtn.blur()
+	}
+
+	showThatThisParentSelectorNowHasVariants() {
+		const parentSelectorId = `#${this.pieceName}ParentSelector`
+
+		const parentSelector = document.querySelector(parentSelectorId)
+		parentSelector.classList.add('hasSomeVariant')
+	}
+
+	changeBtnToInput() {
+		super.changeBtnToInput('text')
 	}
 }
 
@@ -346,43 +660,60 @@ class VariantContextMenu extends CustomSelectorContextMenu {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "EditPieceType": () => (/* binding */ EditPieceType)
+/* harmony export */   "Piece": () => (/* binding */ Piece),
+/* harmony export */   "PieceType": () => (/* binding */ PieceType),
+/* harmony export */   "PieceVariant": () => (/* binding */ PieceVariant)
 /* harmony export */ });
-/* harmony import */ var _components_contextMenus__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./components/contextMenus */ "./public/src/js/components/contextMenus.js");
-/* harmony import */ var _components_codeEditor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./components/codeEditor */ "./public/src/js/components/codeEditor.js");
+/* harmony import */ var _components_design_design_contextMenu__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../components/design/design_contextMenu */ "./public/src/components/design/design_contextMenu.js");
+/* harmony import */ var _components_design_design_newSelectorBtn__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../components/design/design_newSelectorBtn */ "./public/src/components/design/design_newSelectorBtn.js");
+/* harmony import */ var _components_design_design_api__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../components/design/design_api */ "./public/src/components/design/design_api.js");
+/* harmony import */ var _components_codeEditor__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../components/codeEditor */ "./public/src/components/codeEditor.js");
 
 
 
-class EditPieceType {
-	//
-	// When the page is loaded, we create an instance of this EditPieceType class for each piece type on the sidebar, then we add an event listener to render its content when it's clicked.
 
-	// When one of these buttons are clicked, if it leads to a different section, we need to render that content to the user. So first we show the user where they are now, then we clean any content that's currently where we will place new content, and finally we show the parent selectors belonging to that piece type.
 
-	// But in order to show the parent selectors on the screen, we first need to get them on our database through a get request to our server.
+class PieceType {
+	/*
 
-	constructor(pieceType) {
+	// When the page is loaded, we create an instance of PieceType class for each piece type on the sidebar, then we add an event listener onto that piece type to render its content when clicked.
+
+	// If the user clicks on the piece type item that show what's already being shown, we do nothing.
+	// If they click on a different piece type item, we render that content to the user. To do that, we:
+	
+	// 1) show the user where they are now (after they clicked)
+	// 2) then we clean the content area by removing anything that was previously being shown
+	// 3) finally, we show the selectors belonging to that piece type (that we get from our database)
+
+	*/
+
+	constructor({ pieceType }) {
 		this.pieceType = pieceType
-		this.endpoint = `/api/pieces/elements/${this.pieceType.toLowerCase()}`
 		this.btn = document.querySelector(`#editGet${this.pieceType}Btn`)
 		this.childrenLevel = 'parents'
 		this.childrenArea = document.querySelector(`#${this.childrenLevel}Area`)
+		this.endpoint = `/api/pieces/elements/${this.pieceType.toLowerCase()}`
+		this.crud = new _components_design_design_api__WEBPACK_IMPORTED_MODULE_2__.PieceTypeCrud(this.pieceType)
 	}
 
-	addEventListenerToRenderContent() {
-		const boundRenderContent = this.renderContent.bind(this)
-		this.btn.addEventListener('click', boundRenderContent)
+	// adds event listener to render the children of the piece type when it's clicked on the left sidebar
+	addEventListenerToRenderChildren() {
+		const boundRenderSelectorChildren = this.renderChildren.bind(this)
+		this.btn.addEventListener('click', boundRenderSelectorChildren)
 	}
 
-	renderContent(e) {
+	// holds all methods needed to render the children of the piece type to the user
+	renderChildren(e) {
+		// checks whether the children aren't already being shown. if they are, do nothing
 		const isAlreadyBeingShown = e.target.classList.contains('current-place')
 		if (isAlreadyBeingShown) return
 
 		this.showUserWhereTheyAre()
 		this.cleanChildrenArea()
-		this.showContent()
+		this.showChildren() /* this method is different in the children classes */
 	}
 
+	// adds a color or a border to the currently active button (either a piece type btn on the sidebar or a piece selector on the main area)
 	showUserWhereTheyAre() {
 		const siblings = Array.from(this.btn.parentElement.children)
 		siblings.forEach(sibling => sibling.classList.remove('current-place'))
@@ -390,6 +721,7 @@ class EditPieceType {
 		this.btn.classList.add('current-place')
 	}
 
+	// remove from the main area everything that may be there from other piece types that were previously clicked
 	cleanChildrenArea(childrenAreaIdHandle = this.childrenLevel) {
 		const childrenArea = document.querySelector(`#${childrenAreaIdHandle}Area`)
 
@@ -398,138 +730,153 @@ class EditPieceType {
 		}
 	}
 
-	async showContent() {
+	// render the main area to the user, with the current piece type heading and all its piece selectors
+	async showChildren() {
+		// adding the piece type name to the heading on the main area
 		document.querySelector('#editWorkingAreaH1').innerText = this.pieceType
 
-		const allParents = await this.sendGetRequest()
-
-		for (let parentName in allParents) {
-			const parentSelector = new EditParentSelector(
-				this.pieceType,
-				'variants',
-				parentName
-			)
-
-			parentSelector.renderSelector(this.childrenArea, allParents[parentName])
-		}
-	}
-
-	async sendGetRequest() {
-		try {
-			const res = await fetch(this.endpoint, {
-				method: 'GET',
-				headers: { 'Content-Type': 'application/json' },
+		// getting all pieces of this type on the database
+		const allPieces = await this.crud.readPiecesOfType()
+		// rendering on the screen each piece that comes from the database
+		for (let pName in allPieces) {
+			const piece = new Piece({
+				pieceType: /* { pieceType: 'Typography' } */ this.pieceType,
+				childrenLevel: 'variants',
+				pieceName: pName,
 			})
-			const data = await res.json()
-			return data
-		} catch (err) {
-			console.log(err)
+			piece.renderSelector({
+				whereOnTheDom: this.childrenArea,
+				selectorObj: allPieces[pName],
+			})
 		}
 	}
 }
 
-class EditSelector extends EditPieceType {
-	//
+class Selector extends PieceType {
+	/*
+
 	// This is an in-between class and it shouldn't be instantiated. It is used strictly to abstract the common components (properties and methods) out of its two child classes.
 
-	constructor(pieceType, childrenLevel, parentName) {
-		super(pieceType)
+	*/
 
-		this.endpoint = `/api/pieces/elements/${this.pieceType.toLowerCase()}/${parentName}`
+	constructor({ pieceType, childrenLevel, pieceName }) {
+		super({ pieceType })
+		this.pieceType = pieceType
+
 		this.btn = document.createElement('button')
 		this.childrenLevel = childrenLevel
-		this.childrenArea = document.querySelector(`#${childrenLevel}Area`)
-		this.parentName = parentName
+		this.childrenArea = document.querySelector(`#${this.childrenLevel}Area`)
+		this.pieceName = pieceName
+		this.endpoint = `/api/pieces/elements/${this.pieceType.toLowerCase()}/${
+			this.pieceName
+		}`
 	}
 
-	renderSelector(whereOnTheDom) {
-		this.setUpSelectorBtn()
-		this.addEventListenerToRenderContent()
-		this.addSelectorBtnToDom(whereOnTheDom)
+	// holds all methods necessary to show each selector on the main area with all its functionality
+	renderSelector({ whereOnTheDom }) {
+		this.setUpSelectorBtn() /* this method is defined on the children classes */
+		this.addEventListenerToRenderChildren() /* this method comes from the parent class */
+		this.addSelectorBtnToDom(whereOnTheDom) /*defined on the children classes*/
 
+		// checking if the selector has a context menu attached to it, and if it has, adding an an event listener to open the context menu when the user right-clicks it
 		if (this.btn.dataset.context) this.addEventListenerForTheContextMenu()
 	}
 
+	// this method is only defined on the children classes
 	setUpSelectorBtn() {
 		console.log('Please set up setUpSelectorBtn() on the child class')
 	}
 
+	// this method is only defined on the children classes
 	addSelectorBtnToDom() {
 		console.log('Please set up addSelectorBtnToDom() on the child class')
 	}
 
-	addEventListenerForTheContextMenu() {
-		const contextMenu = new _components_contextMenus__WEBPACK_IMPORTED_MODULE_0__.VariantContextMenu(
-			this.pieceType,
-			this.endpoint,
-			this.parentName,
-			this.variantName
-		)
-
-		contextMenu.createContextMenu()
-		contextMenu.setUpContextMenuBtns()
-		contextMenu.detectClickWhileContextMenuIsOpen()
-
-		const boundOpenContextMenu = contextMenu.openContextMenu.bind(contextMenu)
-		this.btn.addEventListener('contextmenu', boundOpenContextMenu)
+	// this method name comes from the parent class, but it is only defined on the children classes
+	showChildren() {
+		console.log('Please set up showContent() on the child class')
 	}
 
-	showContent() {
-		console.log('Please set up showContent() on the child class')
+	// holds all methods needed for the context menu to work as expected
+	addEventListenerForTheContextMenu() {
+		this.contextMenu.createContextMenu()
+		// this.contextMenu.setUpContextMenuBtns()
+		this.contextMenu.detectClickWhileContextMenuIsOpen()
+
+		/* may actually need to bind this.contextMenu */
+		const boundOpenContextMenu = this.contextMenu.openContextMenu.bind(
+			this.contextMenu
+		)
+		this.btn.addEventListener('contextmenu', boundOpenContextMenu)
 	}
 }
 
-class EditParentSelector extends EditSelector {
-	//
-	// When the user goes into an EditPieceType page, we load all
-	// create an instance of this EditPieceType class for each piece type on the sidebar, then we add an event listener to render its content when it's clicked.
+class Piece extends Selector {
+	/*
 
-	// When one of these buttons are clicked, if it leads to a different section, we need to render that content to the user. So first we show the user where they are now, then we clean any content that's currently where we will place new content, and finally we show the parent selectors belonging to that piece type.
+	// When the user is on a piece type area (coming from the left sidebar), we render each piece selector of the type that they clicked.
 
-	// But in order to show the parent selectors on the screen, we first need to get them on our database through a get request to our server.
+	// If the selector has variants, we change the piece selector color to let the user know that it has variants even before clicking them.
 
-	constructor(pieceType, childrenLevel, parentName) {
-		super(pieceType, childrenLevel, parentName)
+	// And when the user clicks on one of the selectors, we:
+
+	// 1) show the current place the user is, by adding a border to the piece selector they clicked
+	// 2) add to a line just below the piece selectors line: a span that says "Variants:", and a "+" button to create new variants
+	// 3) if it's the case that the piece selector clicked already has variants, we show all its variants on that new line, between the span and the "+ button"
+	// 4) after the variants line has all it needs, we make it visible and also make the piece editing area visible.
+
+	*/
+
+	constructor({ pieceType, childrenLevel, pieceName }) {
+		super({ pieceType, childrenLevel, pieceName })
+		this.crud = new _components_design_design_api__WEBPACK_IMPORTED_MODULE_2__.PieceCrud({
+			pieceType: this.pieceType,
+			pieceName: this.pieceName,
+		})
 	}
 
-	// Methods from the prototype that will be modified
-	renderSelector(whereOnTheDom, selectorObj) {
-		super.renderSelector(whereOnTheDom)
+	// holds all methods necessary to show each selector on the main area with all its functionality, and mark them differently in case they have any variants
+	renderSelector({ whereOnTheDom, selectorObj }) {
+		super.renderSelector({ whereOnTheDom })
 
-		this.markSelectorBtnIfCustomized(selectorObj)
+		this.markSelectorBtnIfItHasVariants(selectorObj)
 	}
 
+	// this method is called by super.renderSelector(whereOnTheDom)
 	setUpSelectorBtn() {
 		this.btn.classList.add('tag-btn')
-		this.btn.id = `${this.parentName}ParentSelector`
-		this.btn.innerText = `<${this.parentName}>`
+		this.btn.id = `${this.pieceName}ParentSelector`
+		this.btn.innerText = `<${this.pieceName}>`
 	}
 
+	// this method is called by super.renderSelector(whereOnTheDom)
 	addSelectorBtnToDom(whereOnTheDom) {
 		whereOnTheDom.appendChild(this.btn)
 	}
 
+	// removes all variant selectors from the variant selectors line and all the variant labels (see PieceVariant class) from the variant labels area. it is called by super.renderChildren(), only when the user clicks on a piece selector that's different from the one that's currently showing
 	cleanChildrenArea() {
 		super.cleanChildrenArea() /* this one gets called with the default parameter = this.childrenLevel */
 		super.cleanChildrenArea('variantLabels')
 		// We may need to clean more areas here
 	}
 
-	async showContent() {
+	// holds all methods needed for showing the variant selectors on the variant selectors line
+	async showChildren() {
 		this.createVariantLineSpan()
-		this.createAddNewVariantBtn()
+		this.createNewVariantBtn()
 
-		const allVariants = await this.sendGetRequest()
+		const allVariants = await this.crud.readVariantsOfPiece()
 
-		for (let variantName in allVariants) {
-			const variantSelector = new EditVariantSelector(
-				this.pieceType,
-				'cssRules',
-				this.parentName,
-				variantName
-			)
+		for (let vName in allVariants) {
+			const variant = new PieceVariant({
+				pieceType: this.pieceType,
+				childrenLevel: 'codeEditor',
+				pieceName: this.pieceName,
+				variantName: vName,
+			})
 
-			variantSelector.renderSelector(this.childrenArea)
+			variant.renderSelector({ whereOnTheDom: this.childrenArea })
 		}
 
 		this.makeVariantsLineVisible()
@@ -537,12 +884,12 @@ class EditParentSelector extends EditSelector {
 	}
 
 	// Method needed for this.renderSelector()
-	markSelectorBtnIfCustomized(selectorObj) {
+	markSelectorBtnIfItHasVariants(selectorObj) {
 		const selectorIsCustomized = Object.keys(selectorObj).length
 		if (selectorIsCustomized) this.btn.classList.add('hasSomeVariant')
 	}
 
-	// Methods needed for this.showContent()
+	// adds the "Variant:" span to the variants line. this is called by this.showChildren()
 	createVariantLineSpan() {
 		const variantsLineName = document.createElement('span')
 		variantsLineName.innerText = 'Variants:'
@@ -550,46 +897,65 @@ class EditParentSelector extends EditSelector {
 		this.childrenArea.appendChild(variantsLineName)
 	}
 
-	createAddNewVariantBtn() {
-		const addNewVariant = new EditAddVariantBtn(
-			this.pieceType,
-			this.endpoint,
-			this.parentName,
-			this.childrenArea
-		)
+	// adds the "+" button to the variants line
+	createNewVariantBtn() {
+		const newVariantBtn = new _components_design_design_newSelectorBtn__WEBPACK_IMPORTED_MODULE_1__.NewVariantBtn({
+			pieceType: this.pieceType,
+			selectorsArea: this.childrenArea,
+			pieceName: this.pieceName,
+			createMethod: newVariantName => {
+				this.crud.createVariant(newVariantName)
+			},
+		})
 
-		addNewVariant.setUpForm()
-		addNewVariant.setUpBtn()
-		addNewVariant.setUpChangeBtnOnFocus()
-		addNewVariant.appendBtnToForm()
+		newVariantBtn.setUpForm()
+		newVariantBtn.setUpBtn()
+		newVariantBtn.setUpChangeBtnOnFocus()
+		newVariantBtn.appendBtnToForm()
 
-		this.childrenArea.appendChild(addNewVariant.newVariantForm)
+		this.childrenArea.appendChild(newVariantBtn.newSelectorForm)
 	}
 
+	// this is called by this.showChildren()
 	makeVariantsLineVisible() {
 		this.childrenArea.classList.remove('hidden')
 	}
 
+	// this is called by this.showChildren()
 	makeEditingAreaVisible() {
 		const editingArea = document.querySelector('#editingArea')
 		editingArea.classList.remove('hidden')
 	}
 }
 
-class EditVariantSelector extends EditSelector {
-	constructor(pieceType, childrenLevel, parentName, variantName) {
-		super(pieceType, childrenLevel, parentName)
+class PieceVariant extends Selector {
+	constructor({ pieceType, childrenLevel, pieceName, variantName }) {
+		super({ pieceType, childrenLevel, pieceName })
 
 		this.variantName = variantName
+		this.crud = new _components_design_design_api__WEBPACK_IMPORTED_MODULE_2__.VariantCrud({
+			pieceType: this.pieceType,
+			pieceName: this.pieceName,
+		})
+		this.contextMenu = new _components_design_design_contextMenu__WEBPACK_IMPORTED_MODULE_0__.VariantContextMenu({
+			pieceType: this.pieceType,
+			endpoint: this.endpoint,
+			pieceName: this.pieceName,
+			selectorName: this.variantName,
+			deleteMethod: () => {
+				this.crud.deleteVariant(this.variantName)
+			},
+		})
 	}
 
+	// removes what's written on the code editor. this is called by super.renderChildren(e)
 	cleanChildrenArea() {
-		// Read what's written on the editor
-		const currentValue = _components_codeEditor__WEBPACK_IMPORTED_MODULE_1__.codeEditor.state.doc.toString()
+		// read what's written on the editor
+		const currentValue = _components_codeEditor__WEBPACK_IMPORTED_MODULE_3__.codeEditor.state.doc.toString()
 		const endPosition = currentValue.length
 
-		// Change what's written on the editor
-		_components_codeEditor__WEBPACK_IMPORTED_MODULE_1__.codeEditor.dispatch({
+		// change what's written on the editor to an empty string
+		_components_codeEditor__WEBPACK_IMPORTED_MODULE_3__.codeEditor.dispatch({
 			changes: {
 				from: 0,
 				to: endPosition,
@@ -598,6 +964,7 @@ class EditVariantSelector extends EditSelector {
 		})
 	}
 
+	// this is called by super.renderSelector({ whereOnTheDom })
 	setUpSelectorBtn() {
 		this.btn.classList.add('variation-btn')
 		this.btn.id = `${this.variantName}VariantSelector`
@@ -606,11 +973,12 @@ class EditVariantSelector extends EditSelector {
 		this.btn.dataset.selectorName = this.variantName
 
 		this.btn.innerText =
-			this.variantName === this.parentName
-				? (this.btn.innerText = `<${this.parentName}>`)
-				: (this.btn.innerText = `<${this.parentName}> .${this.variantName}`)
+			this.variantName === this.pieceName
+				? (this.btn.innerText = `<${this.pieceName}>`)
+				: (this.btn.innerText = `<${this.pieceName}> .${this.variantName}`)
 	}
 
+	// adds the variant selector button to the variant selector line, right before the "+" button. this is called by super.renderSelector({ whereOnTheDom })
 	addSelectorBtnToDom(whereOnTheDom) {
 		const newVariantForm = document.querySelector('#newVariantForm')
 		whereOnTheDom.insertBefore(this.btn, newVariantForm)
@@ -618,40 +986,35 @@ class EditVariantSelector extends EditSelector {
 		// add click event listener to enter this variant (showUserWhereTheyAre, cleanChildrenArea, renderCssRules)
 	}
 
-	async showContent() {
-		const allVariants = await this.sendGetRequest()
-		let variantName, cssRules
+	async showChildren() {
+		// instead of returning all variants, this method below needs to return the css declaration block for a specific variant
+		const declarationBlock = await this.crud.readDeclarationBlockOfVariant(
+			this.variantName
+		)
 
-		for (let variant in allVariants) {
-			if (variant === this.variantName) {
-				variantName = variant
-				cssRules = allVariants[variant]
-			}
-		}
-
-		const cssRuleBlock = cssRules.length
-			? cssRules
-					.map(rule => `${Object.keys(rule)}: ${rule[Object.keys(rule)]};`)
+		const cssDeclarations = declarationBlock.length
+			? declarationBlock
+					.map(d => `${Object.keys(d)}: ${d[Object.keys(d)]};`)
 					.join('\n\t')
 			: ''
-		const cssDeclaration = `${variantName} {\n\t${cssRuleBlock}\n}\n`
+		const cssRule = `${this.variantName} {\n\t${cssDeclarations}\n}\n`
 
-		// Read what's written on the editor
-		const currentValue = _components_codeEditor__WEBPACK_IMPORTED_MODULE_1__.codeEditor.state.doc.toString()
+		// get what's written on the editor
+		const currentValue = _components_codeEditor__WEBPACK_IMPORTED_MODULE_3__.codeEditor.state.doc.toString()
 		const endPosition = currentValue.length
 
-		// Change what's written on the editor
-		_components_codeEditor__WEBPACK_IMPORTED_MODULE_1__.codeEditor.dispatch({
+		// change what's written on the editor to the cssDeclaration of the clicked variant
+		_components_codeEditor__WEBPACK_IMPORTED_MODULE_3__.codeEditor.dispatch({
 			changes: {
 				from: 0,
 				to: endPosition,
-				insert: cssDeclaration,
+				insert: cssRule,
 			},
 		})
 	}
 
 	showUserWhereTheyAre() {
-		// Removing the 'current-place' class from other selector btns
+		// removing the 'current-place' class from other selector btns
 		const selectorsBtns = Array.from(this.btn.parentElement.children)
 		selectorsBtns.forEach(btn => btn.classList.remove('current-place'))
 
@@ -680,195 +1043,6 @@ class EditVariantSelector extends EditSelector {
 		variantLabelsArea.appendChild(variantLabel)
 	}
 }
-
-class EditAddVariantBtn {
-	constructor(pieceType, endpoint, parentName, variantsArea) {
-		this.pieceType = pieceType
-		this.endpoint = endpoint
-		this.parentName = parentName
-		this.newVariantForm = document.createElement('form')
-		this.newVariantBtn = document.createElement('input')
-		this.variantsArea = variantsArea
-	}
-
-	setUpForm() {
-		this.newVariantForm.autocomplete = 'off'
-		this.newVariantForm.id = 'newVariantForm'
-		this.addSubmitEventListenerToAddNewVariant()
-	}
-
-	setUpBtn() {
-		this.newVariantBtn.type = 'button'
-		this.newVariantBtn.value = '+'
-		this.newVariantBtn.id = 'newVariantBtn'
-		this.newVariantBtn.classList.add('add-variation-btn')
-		this.newVariantBtn.autocomplete = 'off'
-	}
-
-	setUpChangeBtnOnFocus() {
-		//
-		// Turning btn into input text on click
-		this.newVariantBtn.addEventListener('focusin', () => {
-			//
-			// The 1st variant it is automatically created w/ the default parameter: this.parentSelector
-			// If it's not the 1st, the user can choose the variant's name
-
-			const isTheFirstVariant = !document
-				.querySelector(`#${this.parentName}ParentSelector`)
-				.classList.contains('hasSomeVariant')
-
-			if (isTheFirstVariant) this.createVariant()
-			else this.changeBtnToInput()
-		})
-
-		// Turning input text back into btn on focusout
-		this.newVariantBtn.addEventListener('focusout', () => {
-			this.newVariantBtn.type = 'button'
-			this.newVariantBtn.value = '+'
-		})
-	}
-
-	changeBtnToInput() {
-		this.newVariantBtn.type = 'text'
-		this.newVariantBtn.value = ''
-		this.newVariantForm.focus()
-		this.newVariantBtn.focus()
-		this.newVariantBtn.select()
-	}
-
-	addSubmitEventListenerToAddNewVariant() {
-		this.newVariantForm.addEventListener('submit', e => {
-			e.preventDefault()
-
-			this.createVariant(this.newVariantBtn.value)
-		})
-	}
-
-	async createVariant(inputValue = this.parentName) {
-		try {
-			const res = await fetch(this.endpoint, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					pieceType: this.pieceType,
-					parentName: this.parentName,
-					variantName: inputValue,
-				}),
-			})
-			const dbVariants = await res.json()
-			this.receivePostResponse(dbVariants)
-		} catch (err) {
-			console.log(err)
-		}
-	}
-
-	receivePostResponse(dbVariants) {
-		const domVariants = Array.from(document.querySelectorAll('.variantBtn'))
-		const domVariantsNames = domVariants.map(dv => dv.dataset.selectorName)
-
-		const dbVariantsNames = Object.keys(dbVariants)
-		const newName = dbVariantsNames.find(dbv => !domVariantsNames.includes(dbv))
-
-		const newVariant = new EditVariantSelector(
-			this.pieceType,
-			'cssRules',
-			this.parentName,
-			newName
-		)
-
-		newVariant.renderSelector(this.variantsArea)
-
-		this.showThatThisParentSelectorNowHasVariants()
-		this.newVariantBtn.blur()
-	}
-
-	showThatThisParentSelectorNowHasVariants() {
-		const parentSelectorId = `#${this.parentName}ParentSelector`
-
-		const parentSelector = document.querySelector(parentSelectorId)
-		parentSelector.classList.add('hasSomeVariant')
-	}
-
-	appendBtnToForm() {
-		this.newVariantForm.appendChild(this.newVariantBtn)
-	}
-}
-
-// const typographyType = new EditPieceType('Typography')
-// typographyType.addEventListenerToRenderContent()
-
-// Not sure if we need these classes below
-// class HttpReqs {
-// 	constructor() {}
-// 	async sendGetRequest(whereToGetIt) {
-// 		await this.sendHttpRequest('GET', whereToGetIt)
-// 	}
-
-// 	async sendPostRequest(whereToPostIt, whatToPost) {
-// 		console.log('sending post request')
-// 		await this.sendHttpRequest('POST', whereToPostIt, whatToPost)
-// 	}
-
-// 	async sendPutRequest(whereToUpdateIt, whatToUpdate) {
-// 		await this.sendHttpRequest('PUT', whereToUpdateIt, whatToUpdate)
-// 	}
-
-// 	async sendDeleteRequest(whereToDeleteItFrom, whatToDelete) {
-// 		await this.sendHttpRequest('POST', whereToDeleteItFrom, whatToDelete)
-// 	}
-
-// 	async sendHttpRequest(httpMethod, endpoint, reqBody) {
-// 		try {
-// 			const res = await fetch(
-// 				endpoint,
-// 				httpMethod === 'GET'
-// 					? {
-// 							method: 'GET',
-// 							headers: { 'Content-Type': 'application/json' },
-// 					  }
-// 					: {
-// 							method: httpMethod,
-// 							headers: { 'Content-Type': 'application/json' },
-// 							body: JSON.stringify(reqBody),
-// 					  }
-// 			)
-// 			const data = await res.json()
-// 			console.log(data)
-// 			return data
-// 			// if (httpMethod === 'POST') receiveHttpPost(data)
-// 			// if (httpMethod === 'PUT') receiveHttpPut(data)
-// 			// if (httpMethod === 'DELETE') receiveHttpDelete(data)
-// 		} catch (err) {
-// 			console.log(err)
-// 		}
-// 	}
-// }
-
-// class EditTypeHttpReqs extends HttpReqs {
-// 	constructor(pieceType, endpoint) {
-// 		super()
-// 		this.pieceType = pieceType
-// 		this.endpoint = endpoint
-// 	}
-// 	getTypeSelectors() {
-// 		this.sendGetRequest(this.endpoint)
-// 	}
-// }
-
-// class EditVariantHttpReqs extends HttpReqs {
-// 	constructor(pieceType, selector, endpoint) {
-// 		super()
-// 		this.pieceType = pieceType
-// 		this.selector = selector
-// 		this.endpoint = endpoint
-// 	}
-// 	createVariant(variantName) {
-// 		const pieceType = this.pieceType
-// 		const selector = this.selector
-// 		this.sendPutRequest({ pieceType, selector, variantName }, this.endpoint)
-// 	}
-// 	readVariantRules(variantName) {}
-// }
 
 
 /***/ }),
@@ -26528,29 +26702,28 @@ var __webpack_exports__ = {};
   !*** ./public/main.js ***!
   \************************/
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _src_js_components_accordion__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./src/js/components/accordion */ "./public/src/js/components/accordion.js");
+/* harmony import */ var _src_components_basicUi_accordion__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./src/components/basicUi/accordion */ "./public/src/components/basicUi/accordion.js");
 /* harmony import */ var _src_js_editPage__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./src/js/editPage */ "./public/src/js/editPage.js");
 
 
 
 // Edit > Sidebar toggles
-const branding = new _src_js_components_accordion__WEBPACK_IMPORTED_MODULE_0__.Accordion('editSidebar', 'Branding', 'List')
-const elements = new _src_js_components_accordion__WEBPACK_IMPORTED_MODULE_0__.Accordion('editSidebar', 'Elements', 'List')
-const components = new _src_js_components_accordion__WEBPACK_IMPORTED_MODULE_0__.Accordion('editSidebar', 'Components', 'List')
+const branding = new _src_components_basicUi_accordion__WEBPACK_IMPORTED_MODULE_0__.Accordion('editSidebar', 'Branding', 'List')
+const elements = new _src_components_basicUi_accordion__WEBPACK_IMPORTED_MODULE_0__.Accordion('editSidebar', 'Elements', 'List')
+const components = new _src_components_basicUi_accordion__WEBPACK_IMPORTED_MODULE_0__.Accordion('editSidebar', 'Components', 'List')
 branding.accordToggle.addEventListener('click', branding.openOrClose)
 elements.accordToggle.addEventListener('click', elements.openOrClose)
 components.accordToggle.addEventListener('click', components.openOrClose)
 
 // Edit > Sidebar toggles > Elements
-const typographyType = new _src_js_editPage__WEBPACK_IMPORTED_MODULE_1__.EditPieceType('Typography')
-typographyType.addEventListenerToRenderContent()
+const typographyType = new _src_js_editPage__WEBPACK_IMPORTED_MODULE_1__.PieceType({ pieceType: 'Typography' })
+typographyType.addEventListenerToRenderChildren()
 
 // Edit > Working area > Code editor
 
-
 // Edit > Working area toggles
-const inheritance = new _src_js_components_accordion__WEBPACK_IMPORTED_MODULE_0__.Accordion('editWorkingArea', 'Inherited', 'Rules')
-const sideEffects = new _src_js_components_accordion__WEBPACK_IMPORTED_MODULE_0__.Accordion('editWorkingArea', 'SideEffects', 'Rules')
+const inheritance = new _src_components_basicUi_accordion__WEBPACK_IMPORTED_MODULE_0__.Accordion('editWorkingArea', 'Inherited', 'Rules')
+const sideEffects = new _src_components_basicUi_accordion__WEBPACK_IMPORTED_MODULE_0__.Accordion('editWorkingArea', 'SideEffects', 'Rules')
 inheritance.accordToggle.addEventListener('click', inheritance.openOrClose)
 sideEffects.accordToggle.addEventListener('click', sideEffects.openOrClose)
 
